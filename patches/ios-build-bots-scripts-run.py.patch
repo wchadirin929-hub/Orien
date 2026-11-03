@@ -1,0 +1,13 @@
+diff --git a/ios/build/bots/scripts/run.py b/ios/build/bots/scripts/run.py
+index 50f5804a9246ff9960a1c8c40f2c93761242e5ea..05e3e303b6ed3d6fd6900e20e9c09e8755f28928 100755
+--- a/ios/build/bots/scripts/run.py
++++ b/ios/build/bots/scripts/run.py
+@@ -773,7 +773,7 @@ def main(args):
+   logging.basicConfig(
+     format='[%(asctime)s:%(levelname)s] %(message)s',
+     level=logging.DEBUG,
+-    datefmt='%I:%M:%S',
++    datefmt='%H:%M:%S',
+   )
+ 
+   test_runner.defaults_delete(

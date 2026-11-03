@@ -1,0 +1,27 @@
+diff --git a/chrome/browser/extensions/component_extensions_allowlist/allowlist.cc b/chrome/browser/extensions/component_extensions_allowlist/allowlist.cc
+index 242d73beec5e40450d53789ae7ea023843e805cd..580ffa574f819f56ef6a8d55d81740c3c6facb0c 100644
+--- a/chrome/browser/extensions/component_extensions_allowlist/allowlist.cc
++++ b/chrome/browser/extensions/component_extensions_allowlist/allowlist.cc
+@@ -34,6 +34,12 @@ static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
+ namespace extensions {
+ 
+ bool IsComponentExtensionAllowlisted(const std::string& extension_id) {
++  if (IsComponentExtensionAllowlistedBraveImpl(extension_id)) {
++    return true;
++  }
++  if (IsComponentExtensionDenylistedBraveImpl(extension_id)) {
++    return false;
++  }
+   constexpr auto kAllowed = base::MakeFixedFlatSet<std::string_view>({
+       extension_misc::kAimEligibilityExtensionId,
+       extension_misc::kContextualTasksExtensionId,
+@@ -86,6 +92,9 @@ bool IsComponentExtensionAllowlisted(const std::string& extension_id) {
+ }
+ 
+ bool IsComponentExtensionAllowlisted(int manifest_resource_id) {
++  if (IsComponentExtensionAllowlistedBraveImpl(manifest_resource_id)) {
++    return true;
++  }
+   switch (manifest_resource_id) {
+     // Please keep the list in alphabetical order.
+ #if BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)

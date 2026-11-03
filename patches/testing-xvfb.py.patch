@@ -1,0 +1,13 @@
+diff --git a/testing/xvfb.py b/testing/xvfb.py
+index c22b5802bfcb658bcd943f8506119b445cefb81a..cbcffd38cdce4c59e5fb03a051ca88f4a3491e68 100755
+--- a/testing/xvfb.py
++++ b/testing/xvfb.py
+@@ -119,7 +119,7 @@ def run_executable(
+   cmd,
+   env,
+   stdoutfile=None,
+-  use_openbox=True,
++  use_openbox=False,
+   use_xcompmgr=True,
+   xvfb_whd=None,
+   cwd=None,

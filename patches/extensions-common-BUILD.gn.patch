@@ -1,0 +1,12 @@
+diff --git a/extensions/common/BUILD.gn b/extensions/common/BUILD.gn
+index efe6bc5e6004aadf51847c5fb04c2ada44f8c651..f13142ce1089fad7d11aee06c27101533837ebd6 100644
+--- a/extensions/common/BUILD.gn
++++ b/extensions/common/BUILD.gn
+@@ -63,6 +63,7 @@ source_set("constants_impl") {
+     "//build:chromeos_buildflags",
+     "//extensions/common:export_impl",
+   ]
++  public_deps += [ "//extensions/buildflags" ]
+ 
+   deps = [ "//build:chromecast_buildflags" ]
+ }

@@ -1,0 +1,14 @@
+diff --git a/third_party/blink/renderer/core/script_tools/model_context.cc b/third_party/blink/renderer/core/script_tools/model_context.cc
+index d71b55751aaedf292d34b6a2a4f1908f3fbdd980..fda5c071820cd0ebb2fd8a0fdb39af24fedf3c93 100644
+--- a/third_party/blink/renderer/core/script_tools/model_context.cc
++++ b/third_party/blink/renderer/core/script_tools/model_context.cc
+@@ -912,6 +912,9 @@ void ModelContext::PauseExecution() {
+ }
+ 
+ void ModelContext::NotifyToolChange() {
++  if (auto* web_frame = WebLocalFrameImpl::FromFrame(document_->GetFrame())) {
++    web_frame->NotifyScriptToolsChanged();
++  }
+   DispatchEvent(*Event::Create(event_type_names::kToolchange));
+ }
+ 

@@ -1,0 +1,16 @@
+diff --git a/build/config/unsafe_buffers_paths.txt b/build/config/unsafe_buffers_paths.txt
+index 1bc60565f7163aa799dff23a5833fa9ef2f71afa..1392df70ab6b30eb636ceaf14438861f872ccdcb 100644
+--- a/build/config/unsafe_buffers_paths.txt
++++ b/build/config/unsafe_buffers_paths.txt
+@@ -64,3 +64,11 @@ $../../
+ -third_party/angle/util/egl_loader_autogen.cpp
+ -third_party/angle/util/gles_loader_autogen.cpp
+ -third_party/angle/util/windows/wgl_loader_autogen.cpp
++
++-brave/chromium_src/../../third_party/ffmpeg
++-brave/third_party/argon2/
++-brave/third_party/bip39wally-core-native/
++-brave/third_party/bitcoin-core/
++-brave/third_party/bspatch/
++-brave/third_party/ethash/
++-brave/vendor/bat-native-tweetnacl/

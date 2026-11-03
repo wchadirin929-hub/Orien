@@ -1,0 +1,47 @@
+diff --git a/components/commerce/core/commerce_feature_list.cc b/components/commerce/core/commerce_feature_list.cc
+index 82daeb85e1755c4574d50d3756185584e9f5aadf..26214b4fc071933432b3e889dfa29947ba406ef7 100644
+--- a/components/commerce/core/commerce_feature_list.cc
++++ b/components/commerce/core/commerce_feature_list.cc
+@@ -119,14 +119,14 @@ const re2::RE2& GetCouponPartnerMerchantPattern() {
+ 
+ BASE_FEATURE(kCommerceAllowLocalImages, base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+-BASE_FEATURE(kCommerceAllowOnDemandBookmarkUpdates,
+-             base::FEATURE_ENABLED_BY_DEFAULT);
++BASE_OVERRIDDEN_FEATURE(kCommerceAllowOnDemandBookmarkUpdates,
++             base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+-BASE_FEATURE(kCommerceMerchantViewer, base::FEATURE_DISABLED_BY_DEFAULT);
++BASE_OVERRIDDEN_FEATURE(kCommerceMerchantViewer, base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+ BASE_FEATURE(kCommerceLocalPDPDetection, base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+-BASE_FEATURE(kPriceAnnotations, base::FEATURE_DISABLED_BY_DEFAULT);
++BASE_OVERRIDDEN_FEATURE(kPriceAnnotations, base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+ BASE_FEATURE(kPriceInsights, base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+@@ -205,12 +205,12 @@ BASE_FEATURE(kDiscountsUiRefactor, base::FEATURE_DISABLED_BY_DEFAULT);
+ const base::FeatureParam<bool> kDeleteAllMerchantsOnClearBrowsingHistory{
+     &kCommerceMerchantViewer, "delete_all_merchants_on_clear_history", false};
+ 
+-BASE_FEATURE(kShoppingList, base::FEATURE_DISABLED_BY_DEFAULT);
++BASE_OVERRIDDEN_FEATURE(kShoppingList, base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+ BASE_FEATURE(kPriceTrackingSubscriptionServiceLocaleKey,
+              base::FEATURE_ENABLED_BY_DEFAULT);
+ 
+-BASE_FEATURE(kShoppingPDPMetrics, base::FEATURE_DISABLED_BY_DEFAULT);
++BASE_OVERRIDDEN_FEATURE(kShoppingPDPMetrics, base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+ BASE_FEATURE(kSubscriptionsApi, base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+@@ -218,7 +218,7 @@ BASE_FEATURE(kInStockNotification, base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+ BASE_FEATURE(kShoppingPageTypes, base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+-BASE_FEATURE(kRetailCoupons, base::FEATURE_ENABLED_BY_DEFAULT);
++BASE_OVERRIDDEN_FEATURE(kRetailCoupons, base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+ const char kRetailCouponsWithCodeParam[] = "RetailCouponsWithCodeParam";
+ 

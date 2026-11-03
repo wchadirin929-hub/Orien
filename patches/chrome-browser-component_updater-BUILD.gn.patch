@@ -1,0 +1,20 @@
+diff --git a/chrome/browser/component_updater/BUILD.gn b/chrome/browser/component_updater/BUILD.gn
+index 094cdcd785d9a9d0ba3cd4c750e5e0ee2c788e9b..cc4e660ec7e7bf438c3fb56303021d5e9162585a 100644
+--- a/chrome/browser/component_updater/BUILD.gn
++++ b/chrome/browser/component_updater/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//brave/chromium_src/chrome/browser/component_updater/sources.gni")
+ import("//build/config/chrome_build.gni")
+ import("//chrome/common/request_header_integrity/buildflags.gni")
+ import("//components/on_device_translation/buildflags/features.gni")
+@@ -195,6 +196,7 @@ source_set("impl") {
+     "//services/cert_verifier/public/mojom",
+     "//services/network/public/cpp",
+   ]
++  deps += brave_chromium_src_chrome_browser_component_updater_impl_deps
+ 
+   if (safe_browsing_mode == 2) {
+     sources += [ "real_time_url_checks_allowlist_component_installer.cc" ]

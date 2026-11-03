@@ -1,0 +1,20 @@
+diff --git a/ios/chrome/browser/flags/BUILD.gn b/ios/chrome/browser/flags/BUILD.gn
+index 8061f2d32ce4c6bef7a61e87250e3971dc482e97..e8af17ae604ea9c84472be6884e40ec79077bfd2 100644
+--- a/ios/chrome/browser/flags/BUILD.gn
++++ b/ios/chrome/browser/flags/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//brave/ios/browser/flags/sources.gni")
+ import("//ios/build/chrome_build.gni")
+ 
+ source_set("flags") {
+@@ -130,6 +131,7 @@ source_set("flags") {
+     "//ios/web/common:web_view_creation_util",
+     "//ios/web/public",
+   ]
++  deps += brave_flags_deps
+ }
+ 
+ source_set("system_flags") {

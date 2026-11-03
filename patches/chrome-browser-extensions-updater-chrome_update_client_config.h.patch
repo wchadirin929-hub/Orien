@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/extensions/updater/chrome_update_client_config.h b/chrome/browser/extensions/updater/chrome_update_client_config.h
+index 7ad0fd9e907812340ab7cece03edc0b27b1e46cc..d00b5d76eb56111ea1a3aa02733a8002b9e94627 100644
+--- a/chrome/browser/extensions/updater/chrome_update_client_config.h
++++ b/chrome/browser/extensions/updater/chrome_update_client_config.h
+@@ -93,6 +93,7 @@ class ChromeUpdateClientConfig : public update_client::Configurator {
+   bool IsConnectionMetered() const override;
+ 
+  protected:
++  friend class BraveUpdateClientConfig;
+   friend class base::RefCountedThreadSafe<ChromeUpdateClientConfig>;
+   friend class ExtensionUpdateClientBaseTest;
+ 

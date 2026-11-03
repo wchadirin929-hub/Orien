@@ -1,0 +1,15 @@
+diff --git a/content/common/features.cc b/content/common/features.cc
+index e68d280c71762e9c1b44c0fedc6091786ca4dcf6..fb2759ed136eef25c70ce45dee1e9fef4aed1dfe 100644
+--- a/content/common/features.cc
++++ b/content/common/features.cc
+@@ -614,8 +614,8 @@ BASE_FEATURE(kPriorityOverridePendingViews, base::FEATURE_ENABLED_BY_DEFAULT);
+ 
+ // Enables exposure of the core milestone 1 (M1) APIs in the renderer without an
+ // origin trial token: Attribution Reporting, FLEDGE, Topics.
+-BASE_FEATURE(kPrivacySandboxAdsAPIsM1Override,
+-             base::FEATURE_ENABLED_BY_DEFAULT);
++BASE_OVERRIDDEN_FEATURE(kPrivacySandboxAdsAPIsM1Override,
++             base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+ #if BUILDFLAG(IS_ANDROID)
+ // When disabled("legacy behavior") it resets ongoing gestures when window loses

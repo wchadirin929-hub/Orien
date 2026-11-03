@@ -1,0 +1,20 @@
+diff --git a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java b/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
+index 00af4e2fbb27da0c931a1b292dac0d06827e3eb2..4625610cc73dc9f385198ee8900167216d254613 100644
+--- a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
++++ b/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
+@@ -22,6 +22,8 @@ import java.lang.annotation.Target;
+     ActionId.BACK_BUTTON,
+     ActionId.NEW_TAB,
+     ActionId.GLIC,
++    ActionId.BRAVE_BOOKMARK,
++    ActionId.BRAVE_SEARCH,
+ })
+ @Retention(RetentionPolicy.SOURCE)
+ @Target(ElementType.TYPE_USE)
+@@ -34,4 +36,6 @@ public @interface ActionId {
+     int BACK_BUTTON = 3;
+     int NEW_TAB = 4;
+     int GLIC = 5;
++    int BRAVE_BOOKMARK = 100;
++    int BRAVE_SEARCH = 101;
+ }

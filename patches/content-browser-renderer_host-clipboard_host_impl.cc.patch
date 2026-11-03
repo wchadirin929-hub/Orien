@@ -1,0 +1,33 @@
+diff --git a/content/browser/renderer_host/clipboard_host_impl.cc b/content/browser/renderer_host/clipboard_host_impl.cc
+index 38a163ec1f9a7f1cd0e24fe929ececeefb4baf4b..b63a8f2322361ebbcd0cc44210ba16172ee78cfc 100644
+--- a/content/browser/renderer_host/clipboard_host_impl.cc
++++ b/content/browser/renderer_host/clipboard_host_impl.cc
+@@ -143,6 +143,8 @@ class FrameClipboardContext : public ClipboardHostImpl::Context {
+   }
+ #endif
+ 
++  std::optional<GURL> SanitizeURL(const GURL& url) override;
++
+  private:
+   // The DocumentService that owns the host dies with the document.
+   const raw_ref<RenderFrameHostImpl> render_frame_host_;
+@@ -343,6 +345,10 @@ class ClipboardHostDocumentHelper
+   }
+ #endif
+ 
++  void SanitizeOnNextWriteText() override {
++    impl_->SanitizeOnNextWriteText();
++  }
++
+  private:
+   std::unique_ptr<ClipboardHostImpl> impl_;
+ };
+@@ -886,6 +892,8 @@ void ClipboardHostImpl::WriteText(const std::u16string& text) {
+   ClipboardPasteData data;
+   data.text = text;
+   ++pending_writes_;
++  MaybeSanitizeClipboardText(*context_, sanitize_on_next_write_text_,
++                            data.text);
+   GetContentClient()->browser()->IsClipboardCopyAllowedByPolicy(
+       context_->CreateClipboardEndpoint(),
+       {

@@ -1,0 +1,9 @@
+diff --git a/third_party/blink/renderer/bindings/scripts/web_idl/idl_compiler.py b/third_party/blink/renderer/bindings/scripts/web_idl/idl_compiler.py
+index 9827f853edab89804ea94a77f77afc239be8bb51..e7db736ce89b9c15b563abc0bb7109fbef63bffb 100644
+--- a/third_party/blink/renderer/bindings/scripts/web_idl/idl_compiler.py
++++ b/third_party/blink/renderer/bindings/scripts/web_idl/idl_compiler.py
+@@ -1489,3 +1489,4 @@ class IdlCompiler(object):
+             "core" in original_ir.components
+             and "modules" in extended_ir.components
+         )
++from brave_chromium_utils import inline_chromium_src_override; inline_chromium_src_override(globals(), locals())

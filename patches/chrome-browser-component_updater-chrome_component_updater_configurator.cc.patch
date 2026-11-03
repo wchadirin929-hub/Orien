@@ -1,0 +1,16 @@
+diff --git a/chrome/browser/component_updater/chrome_component_updater_configurator.cc b/chrome/browser/component_updater/chrome_component_updater_configurator.cc
+index da79189b0448440f331916fc2869ca3ecbaca1a0..96dacded9bcbe53c2152ff0b3f79763145e79e23 100644
+--- a/chrome/browser/component_updater/chrome_component_updater_configurator.cc
++++ b/chrome/browser/component_updater/chrome_component_updater_configurator.cc
+@@ -344,7 +344,10 @@ bool ChromeConfigurator::IsConnectionMetered() const {
+ scoped_refptr<update_client::Configurator>
+ MakeChromeComponentUpdaterConfigurator(const base::CommandLine* cmdline,
+                                        PrefService* pref_service) {
+-  return base::MakeRefCounted<ChromeConfigurator>(cmdline, pref_service);
++  return base::MakeRefCounted<BraveConfigurator>(
++      cmdline, pref_service,
++      g_browser_process->system_network_context_manager()
++          ->GetSharedURLLoaderFactory());
+ }
+ 
+ }  // namespace component_updater

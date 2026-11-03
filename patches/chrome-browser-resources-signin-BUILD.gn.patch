@@ -1,0 +1,18 @@
+diff --git a/chrome/browser/resources/signin/BUILD.gn b/chrome/browser/resources/signin/BUILD.gn
+index 15eead184629130a05a92ad6fb564cd7bbf4f1f7..05f4aba30ab0cb765f0b7c6783fa927bb9406617 100644
+--- a/chrome/browser/resources/signin/BUILD.gn
++++ b/chrome/browser/resources/signin/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//brave/ui/webui/custom_profile_image/buildflags/buildflags.gni")
+ import("//chrome/common/features.gni")
+ import("//components/signin/features.gni")
+ import("//ui/webui/resources/tools/build_webui.gni")
+@@ -180,4 +181,5 @@ build_webui("build") {
+   ]
+ 
+   webui_context_type = "trusted"
++  preprocessor_defines = [ "enable_brave_custom_profile_image_webui=$enable_brave_custom_profile_image_webui" ]
+ }

@@ -1,0 +1,21 @@
+diff --git a/components/sync/engine/BUILD.gn b/components/sync/engine/BUILD.gn
+index cba82110676b75b0618b7d673e0a91caf54ce28d..092d545abe6395536d0aa9340a36b2494b978c19 100644
+--- a/components/sync/engine/BUILD.gn
++++ b/components/sync/engine/BUILD.gn
+@@ -2,6 +2,8 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//brave/components/sync/engine/sources.gni")
++
+ static_library("engine") {
+   sources = [
+     "active_devices_invalidation_info.cc",
+@@ -159,6 +161,7 @@ static_library("engine") {
+     "traffic_logger.h",
+     "update_handler.h",
+   ]
++  sources += brave_components_sync_engine_sources
+ 
+   configs += [
+     # The target has >50 .cc files, so speed up the build with

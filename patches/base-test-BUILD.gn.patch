@@ -1,0 +1,20 @@
+diff --git a/base/test/BUILD.gn b/base/test/BUILD.gn
+index cfe8e38be8219eb6652b9f3f2a9fb22f6d643400..780c48059d2ef0f715e5dc0e37e2705b3d79c515 100644
+--- a/base/test/BUILD.gn
++++ b/base/test/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//brave/base/sources.gni")
+ import("//build/compiled_action.gni")
+ import("//build/config/features.gni")
+ import("//build/config/ui.gni")
+@@ -270,6 +271,7 @@ static_library("test_support") {
+     "with_feature_override.cc",
+     "with_feature_override.h",
+   ]
++  sources += brave_base_test_support_sources
+ 
+   configs += [ "//build/config:precompiled_headers" ]
+ 

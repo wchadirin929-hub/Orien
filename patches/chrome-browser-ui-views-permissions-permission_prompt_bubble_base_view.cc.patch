@@ -1,0 +1,50 @@
+diff --git a/chrome/browser/ui/views/permissions/permission_prompt_bubble_base_view.cc b/chrome/browser/ui/views/permissions/permission_prompt_bubble_base_view.cc
+index 29130687fb170bf928680dd922b3feab386ca712..1f8451ac8e4c3161e034c745abb7656b348bff9c 100644
+--- a/chrome/browser/ui/views/permissions/permission_prompt_bubble_base_view.cc
++++ b/chrome/browser/ui/views/permissions/permission_prompt_bubble_base_view.cc
+@@ -89,6 +89,7 @@ PermissionPromptBubbleBaseView::~PermissionPromptBubbleBaseView() = default;
+ void PermissionPromptBubbleBaseView::CreatePermissionButtons(
+     const std::u16string& allow_always_text,
+     const std::u16string& block_text) {
++  [&]() -> void {
+   if (delegate_) {
+     if (std::optional<std::u16string> explanation =
+             GetSubAppsPermissionExplanation(
+@@ -180,6 +181,20 @@ void PermissionPromptBubbleBaseView::CreatePermissionButtons(
+     SetButtonStyle(ui::mojom::DialogButton::kOk, ui::ButtonStyle::kTonal);
+     SetButtonStyle(ui::mojom::DialogButton::kCancel, ui::ButtonStyle::kTonal);
+   }
++  }();
++  BrowserWindowInterface* const brave_browser = GetBrowser();
++  AddAdditionalPermissionViewControlsIfNeeded(this, delegate_->Requests());
++  auto* permission_lifetime_view =
++      AddPermissionLifetimeComboboxIfNeeded(this, delegate_.get());
++  AddFootnoteViewIfNeeded(this, delegate_->Requests(), brave_browser);
++  if (permission_lifetime_view) {
++    set_fixed_width(
++        std::max(GetPreferredSize().width(),
++                 permission_lifetime_view->GetPreferredSize().width()) +
++        margins().width());
++    set_should_ignore_snapping(true);
++  }
++  AddGeolocationDescriptionIfNeeded(this, delegate_.get(), brave_browser);
+ }
+ 
+ void PermissionPromptBubbleBaseView::CreateExtraTextLabel(
+@@ -202,6 +217,7 @@ void PermissionPromptBubbleBaseView::Show() {
+ }
+ 
+ void PermissionPromptBubbleBaseView::CreateWidget() {
++  [&]() -> void {
+   CHECK(GetNativeWindow());
+ 
+   UpdateAnchorPosition();
+@@ -216,6 +232,8 @@ void PermissionPromptBubbleBaseView::CreateWidget() {
+   }
+ 
+   widget->SetZOrderSublevel(ChromeWidgetSublevel::kSublevelSecurity);
++  }();
++  z_order_manager_ = std::make_unique<PermissionPromptBubbleZOrderManager>(*this);
+ }
+ 
+ void PermissionPromptBubbleBaseView::ShowWidget() {

@@ -1,0 +1,45 @@
+diff --git a/chrome/browser/importer/importer_list.cc b/chrome/browser/importer/importer_list.cc
+index 1d7c9bca117843a2a869bac43de3b4e53ceedf65..8501459d11d7434f44b170d56463b5ed4f0167b2 100644
+--- a/chrome/browser/importer/importer_list.cc
++++ b/chrome/browser/importer/importer_list.cc
+@@ -51,7 +51,7 @@ void DetectEdgeProfiles(
+     return;
+   }
+   user_data_importer::SourceProfile edge;
+-  edge.importer_name = l10n_util::GetStringUTF16(IDS_IMPORT_FROM_EDGE);
++  edge.importer_name = l10n_util::GetStringUTF16(IDS_BRAVE_IMPORT_FROM_EDGE);
+   edge.importer_type = user_data_importer::TYPE_EDGE;
+   edge.services_supported = user_data_importer::FAVORITES;
+   edge.source_path = importer::GetEdgeDataFilePath();
+@@ -171,20 +171,30 @@ std::vector<user_data_importer::SourceProfile> DetectSourceProfilesWorker(
+   if (shell_integration::IsFirefoxDefaultBrowser()) {
+     DetectFirefoxProfiles(locale, &profiles);
+     DetectBuiltinWindowsProfiles(&profiles);
++    DetectChromeProfiles(&profiles);
+   } else {
+     DetectBuiltinWindowsProfiles(&profiles);
+     DetectFirefoxProfiles(locale, &profiles);
++    DetectChromeProfiles(&profiles);
+   }
+ #elif BUILDFLAG(IS_MAC)
+   if (shell_integration::IsFirefoxDefaultBrowser()) {
+     DetectFirefoxProfiles(locale, &profiles);
+     DetectSafariProfiles(&profiles);
++    DetectChromeProfiles(&profiles);
+   } else {
+     DetectSafariProfiles(&profiles);
+     DetectFirefoxProfiles(locale, &profiles);
++    DetectChromeProfiles(&profiles);
+   }
+ #else
+-  DetectFirefoxProfiles(locale, &profiles);
++  if (shell_integration::IsFirefoxDefaultBrowser()) {
++    DetectFirefoxProfiles(locale, &profiles);
++    DetectChromeProfiles(&profiles);
++  } else {
++    DetectChromeProfiles(&profiles);
++    DetectFirefoxProfiles(locale, &profiles);
++  }
+ #endif
+   if (include_interactive_profiles) {
+     user_data_importer::SourceProfile bookmarks_profile;

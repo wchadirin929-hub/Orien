@@ -1,0 +1,20 @@
+diff --git a/third_party/blink/public/mojom/BUILD.gn b/third_party/blink/public/mojom/BUILD.gn
+index f43e0699bcb3d790a384c7814c4f9f51817a8b9f..87fa2b832fcaae2234484a58c57634b54ea26ea0 100644
+--- a/third_party/blink/public/mojom/BUILD.gn
++++ b/third_party/blink/public/mojom/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//brave/third_party/blink/public/mojom/sources.gni")
+ import("//build/config/features.gni")
+ import("//build/config/ui.gni")
+ import("//mojo/public/tools/bindings/mojom.gni")
+@@ -386,6 +387,7 @@ mojom("mojom_platform") {
+     "//url/mojom:url_mojom_origin",
+     "//url/mojom:url_mojom_scheme_host_port",
+   ]
++  public_deps += brave_third_party_blink_public_mojom_platform_public_deps
+ 
+   if (is_android) {
+     # Direct deps (instead of transitive deps) are necessary for java targets.

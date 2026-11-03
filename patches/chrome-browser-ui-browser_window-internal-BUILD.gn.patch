@@ -1,0 +1,20 @@
+diff --git a/chrome/browser/ui/browser_window/internal/BUILD.gn b/chrome/browser/ui/browser_window/internal/BUILD.gn
+index bbf731f6eda43ad882726f444e9c4e31509fba8b..f5c08b18e0a4a70f683d508699de6af92e4238c1 100644
+--- a/chrome/browser/ui/browser_window/internal/BUILD.gn
++++ b/chrome/browser/ui/browser_window/internal/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//brave/browser/ui/browser_window/internal/sources.gni")
+ import("//build/config/chrome_build.gni")
+ import("//chrome/common/features.gni")
+ 
+@@ -24,6 +25,7 @@ source_set("internal") {
+     "//ui/base",
+     "//ui/base/unowned_user_data",
+   ]
++  deps += brave_browser_window_internal_deps
+ 
+   if (is_android) {
+     # On Android, this target shouldn't be used by anything outside this

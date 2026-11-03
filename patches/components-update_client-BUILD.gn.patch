@@ -1,0 +1,28 @@
+diff --git a/components/update_client/BUILD.gn b/components/update_client/BUILD.gn
+index 4ae66358bf57674e406415a0f4e92b84be237a9b..15a3c80d6e4eb255b221c9a6ed120b9a660983d0 100644
+--- a/components/update_client/BUILD.gn
++++ b/components/update_client/BUILD.gn
+@@ -86,6 +86,7 @@ group("common_impl") {
+ }
+ 
+ static_library("update_client") {
++  public_deps = brave_components_update_client_public_deps
+   include_dirs = [ "//third_party/puffin/src/include" ]
+   sources = [
+     "action_runner.cc",
+@@ -174,6 +175,7 @@ static_library("update_client") {
+     "utils.cc",
+     "utils.h",
+   ]
++  sources += brave_components_update_client_sources
+ 
+   deps = [
+     "//base",
+@@ -187,6 +189,7 @@ static_library("update_client") {
+     "//third_party/zlib/google:compression_utils",
+     "//url",
+   ]
++  deps += brave_components_update_client_deps
+ 
+   if (is_mac) {
+     sources += [

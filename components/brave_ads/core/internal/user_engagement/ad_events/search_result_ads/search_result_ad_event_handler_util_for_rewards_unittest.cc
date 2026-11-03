@@ -1,0 +1,253 @@
+/* Copyright (c) 2024 The Brave Authors. All rights reserved.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at https://mozilla.org/MPL/2.0/. */
+
+#include <cstddef>
+
+#include "base/test/test_future.h"
+#include "brave/components/brave_ads/core/internal/ad_units/search_result_ad/search_result_ad_builder.h"
+#include "brave/components/brave_ads/core/internal/ad_units/search_result_ad/search_result_ad_info.h"
+#include "brave/components/brave_ads/core/internal/ad_units/search_result_ad/test/search_result_ad_test_util.h"
+#include "brave/components/brave_ads/core/internal/common/test/test_base.h"
+#include "brave/components/brave_ads/core/internal/common/test/time_test_util.h"
+#include "brave/components/brave_ads/core/internal/creatives/conversions/campaign_conversion_builder.h"
+#include "brave/components/brave_ads/core/internal/creatives/conversions/campaign_conversion_database_table.h"
+#include "brave/components/brave_ads/core/internal/creatives/conversions/campaign_conversion_info.h"
+#include "brave/components/brave_ads/core/internal/creatives/search_result_ads/test/creative_search_result_ad_test_util.h"
+#include "brave/components/brave_ads/core/internal/user_engagement/ad_events/ad_event_builder.h"
+#include "brave/components/brave_ads/core/internal/user_engagement/ad_events/search_result_ads/search_result_ad_event_handler_util.h"
+
+// pnpm test brave_unit_tests --filter=BraveAds*
+
+namespace brave_ads {
+
+class BraveAdsSearchResultAdEventHandlerUtilForRewardsTest
+    : public test::TestBase {
+ protected:
+  database::table::CampaignConversions campaign_conversions_database_table_;
+};
+
+TEST_F(BraveAdsSearchResultAdEventHandlerUtilForRewardsTest,
+       SaveCampaignConversionForViewedEvent) {
+  // Arrange
+  const mojom::CreativeSearchResultAdInfoPtr mojom_creative_ad =
+      test::BuildCreativeSearchResultAdWithConversion(
+          /*use_random_uuids=*/true);
+
+  // Act
+  MaybeBuildAndSaveCampaignConversion(
+      mojom_creative_ad, mojom::SearchResultAdEventType::kViewedImpression);
+
+  // Assert
+  std::optional<CampaignConversionInfo> campaign_conversion =
+      FromMojomMaybeBuildCampaignConversion(mojom_creative_ad);
+  ASSERT_TRUE(campaign_conversion);
+
+  base::test::TestFuture<bool, CampaignConversionList> test_future;
+  campaign_conversions_database_table_.GetUnexpired(
+      test_future.GetCallback<bool, const CampaignConversionList&>());
+  const auto [success, campaign_conversions] = test_future.Take();
+  EXPECT_TRUE(success);
+  EXPECT_THAT(campaign_conversions,
+              ::testing::ElementsAre(*campaign_conversion));
+}
+
+TEST_F(BraveAdsSearchResultAdEventHandlerUtilForRewardsTest,
+       DoNotSaveCampaignConversionForNonViewedEvent) {
+  // Arrange
+  const mojom::CreativeSearchResultAdInfoPtr mojom_creative_ad =
+      test::BuildCreativeSearchResultAdWithConversion(
+          /*use_random_uuids=*/true);
+
+  // Act
+  for (size_t i = 0;
+       i < static_cast<size_t>(mojom::SearchResultAdEventType::kMaxValue);
+       ++i) {
+    const auto mojom_ad_event_type =
+        static_cast<mojom::SearchResultAdEventType>(i);
+    if (mojom_ad_event_type !=
+        mojom::SearchResultAdEventType::kViewedImpression) {
+      MaybeBuildAndSaveCampaignConversion(mojom_creative_ad,
+                                          mojom_ad_event_type);
+    }
+  }
+
+  // Assert
+  base::test::TestFuture<bool, CampaignConversionList> test_future;
+  campaign_conversions_database_table_.GetUnexpired(
+      test_future.GetCallback<bool, const CampaignConversionList&>());
+  const auto [success, campaign_conversions] = test_future.Take();
+  EXPECT_TRUE(success);
+  EXPECT_THAT(campaign_conversions, ::testing::IsEmpty());
+}
+
+TEST_F(BraveAdsSearchResultAdEventHandlerUtilForRewardsTest,
+       DoNotSaveCampaignConversionForViewedEventWithoutConversion) {
+  // Arrange
+  const mojom::CreativeSearchResultAdInfoPtr mojom_creative_ad =
+      test::BuildCreativeSearchResultAd(/*use_random_uuids=*/true);
+
+  // Act
+  MaybeBuildAndSaveCampaignConversion(
+      mojom_creative_ad, mojom::SearchResultAdEventType::kViewedImpression);
+
+  // Assert
+  base::test::TestFuture<bool, CampaignConversionList> test_future;
+  campaign_conversions_database_table_.GetUnexpired(
+      test_future.GetCallback<bool, const CampaignConversionList&>());
+  const auto [success, campaign_conversions] = test_future.Take();
+  EXPECT_TRUE(success);
+  EXPECT_THAT(campaign_conversions, ::testing::IsEmpty());
+}
+
+TEST_F(BraveAdsSearchResultAdEventHandlerUtilForRewardsTest,
+       AllowedToFireEventWithConversion) {
+  // Arrange
+  const mojom::CreativeSearchResultAdInfoPtr mojom_creative_ad =
+      test::BuildCreativeSearchResultAdWithConversion(
+          /*use_random_uuids=*/true);
+
+  // Act & Assert
+  for (size_t i = 0;
+       i < static_cast<size_t>(mojom::SearchResultAdEventType::kMaxValue);
+       ++i) {
+    const auto mojom_ad_event_type =
+        static_cast<mojom::SearchResultAdEventType>(i);
+    EXPECT_TRUE(IsAllowedToFireAdEvent(mojom_creative_ad, mojom_ad_event_type));
+  }
+}
+
+TEST_F(BraveAdsSearchResultAdEventHandlerUtilForRewardsTest,
+       AllowedtoFireEventWithoutConversion) {
+  // Arrange
+  const mojom::CreativeSearchResultAdInfoPtr mojom_creative_ad =
+      test::BuildCreativeSearchResultAd(
+          /*use_random_uuids=*/true);
+
+  // Act & Assert
+  for (size_t i = 0;
+       i < static_cast<size_t>(mojom::SearchResultAdEventType::kMaxValue);
+       ++i) {
+    const auto mojom_ad_event_type =
+        static_cast<mojom::SearchResultAdEventType>(i);
+    EXPECT_TRUE(IsAllowedToFireAdEvent(mojom_creative_ad, mojom_ad_event_type));
+  }
+}
+
+TEST_F(BraveAdsSearchResultAdEventHandlerUtilForRewardsTest,
+       ShouldFireEventIfAdPlacementWasServed) {
+  // Arrange
+  const mojom::CreativeSearchResultAdInfoPtr mojom_creative_ad =
+      test::BuildCreativeSearchResultAdWithConversion(
+          /*use_random_uuids=*/true);
+  const SearchResultAdInfo ad = FromMojomBuildSearchResultAd(mojom_creative_ad);
+
+  AdEventList ad_events;
+  const AdEventInfo ad_event =
+      BuildAdEvent(ad, mojom::ConfirmationType::kServedImpression,
+                   /*created_at=*/test::Now());
+  ad_events.push_back(ad_event);
+
+  // Act & Assert
+  EXPECT_TRUE(ShouldFireAdEvent(
+      ad, ad_events, mojom::SearchResultAdEventType::kViewedImpression));
+}
+
+TEST_F(BraveAdsSearchResultAdEventHandlerUtilForRewardsTest,
+       ShouldNotFireEventIfAdPlacementWasNeverServed) {
+  // Arrange
+  const mojom::CreativeSearchResultAdInfoPtr mojom_creative_ad =
+      test::BuildCreativeSearchResultAdWithConversion(
+          /*use_random_uuids=*/true);
+  const SearchResultAdInfo ad = FromMojomBuildSearchResultAd(mojom_creative_ad);
+
+  // Act & Assert
+  EXPECT_FALSE(ShouldFireAdEvent(
+      ad, /*ad_events=*/{}, mojom::SearchResultAdEventType::kViewedImpression));
+}
+
+TEST_F(BraveAdsSearchResultAdEventHandlerUtilForRewardsTest,
+       ShouldFireNonDuplicateViewedEvent) {
+  // Arrange
+  const mojom::CreativeSearchResultAdInfoPtr mojom_creative_ad =
+      test::BuildCreativeSearchResultAdWithConversion(
+          /*use_random_uuids=*/true);
+  const SearchResultAdInfo ad = FromMojomBuildSearchResultAd(mojom_creative_ad);
+
+  AdEventList ad_events;
+  const AdEventInfo ad_event =
+      BuildAdEvent(ad, mojom::ConfirmationType::kServedImpression,
+                   /*created_at=*/test::Now());
+  ad_events.push_back(ad_event);
+
+  // Act & Assert
+  EXPECT_TRUE(ShouldFireAdEvent(
+      ad, ad_events, mojom::SearchResultAdEventType::kViewedImpression));
+}
+
+TEST_F(BraveAdsSearchResultAdEventHandlerUtilForRewardsTest,
+       ShouldNotFireDuplicateViewedEvent) {
+  // Arrange
+  const mojom::CreativeSearchResultAdInfoPtr mojom_creative_ad =
+      test::BuildCreativeSearchResultAdWithConversion(
+          /*use_random_uuids=*/true);
+  const SearchResultAdInfo ad = FromMojomBuildSearchResultAd(mojom_creative_ad);
+
+  AdEventList ad_events;
+  const AdEventInfo ad_event_1 =
+      BuildAdEvent(ad, mojom::ConfirmationType::kServedImpression,
+                   /*created_at=*/test::Now());
+  ad_events.push_back(ad_event_1);
+  const AdEventInfo ad_event_2 =
+      BuildAdEvent(ad, mojom::ConfirmationType::kViewedImpression,
+                   /*created_at=*/test::Now());
+  ad_events.push_back(ad_event_2);
+
+  // Act & Assert
+  EXPECT_FALSE(ShouldFireAdEvent(
+      ad, ad_events, mojom::SearchResultAdEventType::kViewedImpression));
+}
+
+TEST_F(BraveAdsSearchResultAdEventHandlerUtilForRewardsTest,
+       ShouldFireNonDuplicateClickedEvent) {
+  // Arrange
+  const mojom::CreativeSearchResultAdInfoPtr mojom_creative_ad =
+      test::BuildCreativeSearchResultAdWithConversion(
+          /*use_random_uuids=*/true);
+  const SearchResultAdInfo ad = FromMojomBuildSearchResultAd(mojom_creative_ad);
+
+  AdEventList ad_events;
+  const AdEventInfo ad_event =
+      BuildAdEvent(ad, mojom::ConfirmationType::kServedImpression,
+                   /*created_at=*/test::Now());
+  ad_events.push_back(ad_event);
+
+  // Act & Assert
+  EXPECT_TRUE(ShouldFireAdEvent(ad, ad_events,
+                                mojom::SearchResultAdEventType::kClicked));
+}
+
+TEST_F(BraveAdsSearchResultAdEventHandlerUtilForRewardsTest,
+       ShouldNotFireDuplicateClickedEvent) {
+  // Arrange
+  const mojom::CreativeSearchResultAdInfoPtr mojom_creative_ad =
+      test::BuildCreativeSearchResultAdWithConversion(
+          /*use_random_uuids=*/true);
+  const SearchResultAdInfo ad = FromMojomBuildSearchResultAd(mojom_creative_ad);
+
+  AdEventList ad_events;
+  const AdEventInfo ad_event_1 =
+      BuildAdEvent(ad, mojom::ConfirmationType::kServedImpression,
+                   /*created_at=*/test::Now());
+  ad_events.push_back(ad_event_1);
+  const AdEventInfo ad_event_2 = BuildAdEvent(
+      ad, mojom::ConfirmationType::kClicked, /*created_at=*/test::Now());
+  ad_events.push_back(ad_event_2);
+
+  // Act & Assert
+  EXPECT_FALSE(ShouldFireAdEvent(ad, ad_events,
+                                 mojom::SearchResultAdEventType::kClicked));
+}
+
+}  // namespace brave_ads

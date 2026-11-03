@@ -1,0 +1,12 @@
+diff --git a/crypto/aead.cc b/crypto/aead.cc
+index 127c13dd02c712b0377e8a21816fc2fb6dd44af5..5187aeb0a9a65369d67a3745596395a8ad56ab44 100644
+--- a/crypto/aead.cc
++++ b/crypto/aead.cc
+@@ -176,6 +176,7 @@ size_t Aead::KeyLength() const {
+ }
+ 
+ size_t Aead::NonceLength() const {
++  BRAVE_NONCE_LENGTH
+   return aead::NonceSizeFor(algorithm_);
+ }
+ 

@@ -1,0 +1,24 @@
+diff --git a/components/page_info/page_info.cc b/components/page_info/page_info.cc
+index e56071dd2f9f036722f940f8fdfacafff091aab9..cd84bdee3a971b2812b669ec6ad1926b9b25af4b 100644
+--- a/components/page_info/page_info.cc
++++ b/components/page_info/page_info.cc
+@@ -1420,6 +1420,9 @@ void PageInfo::PopulatePermissionInfo(PermissionInfo& permission_info,
+ // second section, the default behavior used when no per-type exception applies.
+ bool PageInfo::ShouldShowPermission(
+     const PageInfo::PermissionInfo& info) const {
++  if (!delegate_->BraveShouldShowPermission(info.type)) {
++    return false;
++  }
+ #if BUILDFLAG(IS_ANDROID)
+   if (info.type == ContentSettingsType::NOTIFICATIONS) {
+     // `is_requested` is only populated if
+@@ -1650,6 +1653,9 @@ void PageInfo::PresentSitePermissions() {
+ 
+ std::set<net::SchemefulSite> PageInfo::GetTwoSitePermissionRequesters(
+     ContentSettingsType type) {
++  if (type == ContentSettingsType::STORAGE_ACCESS) {
++    return {};
++  }
+   std::set<net::SchemefulSite> requesters;
+   // Collect sites that have tried to request a permission.
+   auto* pscs = GetPageSpecificContentSettings();

@@ -1,0 +1,62 @@
+diff --git a/chrome/browser/extensions/BUILD.gn b/chrome/browser/extensions/BUILD.gn
+index 8f5ae8c9a383c1bc09dd83c10a00d6e92f8dc90e..adaa60698551c6007b96230a5c637d6301b58c72 100644
+--- a/chrome/browser/extensions/BUILD.gn
++++ b/chrome/browser/extensions/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//brave/browser/extensions/resources.gni")
+ import("//build/config/chromebox_for_meetings/buildflags.gni")
+ import("//build/config/features.gni")
+ import("//build/config/ozone.gni")
+@@ -655,6 +656,7 @@ source_set("extensions") {
+     "//ui/native_window_tracker",
+     "//ui/shell_dialogs",
+   ]
++  deps += brave_extensions_resources
+   public_deps = [
+     "//chrome/browser/extensions/api/messaging",
+     "//chrome/browser/media/webrtc",
+@@ -703,7 +705,7 @@ source_set("extensions") {
+       "//components/optimization_guide/core:features",
+     ]
+ 
+-    if (enable_desktop_android_extensions) {
++    if (enable_extensions_core) {
+       sources += [
+         # These files are temporary workarounds to allow for a lightweight
+         # extensions runtime in desktop-android builds. They should be removed
+@@ -2060,6 +2062,7 @@ source_set("unit_tests") {
+     "//base",
+     "//base/test:test_config",
+     "//base/test:test_support",
++    "//brave/browser/extensions",
+     "//chrome/browser:browser_process_impl",
+     "//chrome/browser:global_features",
+     "//chrome/browser/background",
+@@ -2230,7 +2233,7 @@ source_set("unit_tests") {
+       ]
+     }
+ 
+-    if (enable_service_discovery) {
++    if (enable_service_discovery && (!is_android || is_desktop_android)) {
+       sources += [ "api/mdns/mdns_api_unittest.cc" ]
+       deps += [ "//chrome/browser/extensions/api/mdns" ]
+     }
+@@ -2333,6 +2336,7 @@ source_set("unit_tests") {
+ }
+ 
+ # By default these tests run on Win, Mac, Linux, Chrome OS and desktop Android.
++if (!is_android || is_desktop_android) {
+ source_set("browser_tests") {
+   testonly = true
+ 
+@@ -3270,6 +3274,7 @@ source_set("browser_tests") {
+     deps += [ "//chrome/browser/ui/views/web_apps:launch_dialogs" ]
+   }
+ }
++}
+ 
+ source_set("interactive_ui_tests") {
+   testonly = true

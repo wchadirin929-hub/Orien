@@ -1,0 +1,12 @@
+diff --git a/ios/chrome/browser/flags/about_flags.mm b/ios/chrome/browser/flags/about_flags.mm
+index e90703e61975d130d72d96ee63e7dff4c4aab408..3b2d09ea20a0299682fe9539411cb353c84f3594 100644
+--- a/ios/chrome/browser/flags/about_flags.mm
++++ b/ios/chrome/browser/flags/about_flags.mm
+@@ -1454,6 +1454,7 @@ const FeatureEntry::FeatureVariation kEnterpriseProxyErrorHandlingVariations[] =
+ //
+ // When adding a new choice, add it to the end of the list.
+ constexpr auto kFeatureEntries = std::to_array<flags_ui::FeatureEntry>({
++    BRAVE_ABOUT_FLAGS_FEATURE_ENTRIES
+     {"in-product-help-demo-mode-choice",
+      flag_descriptions::kInProductHelpDemoModeName,
+      flag_descriptions::kInProductHelpDemoModeDescription, flags_ui::kOsIos,

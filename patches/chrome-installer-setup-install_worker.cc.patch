@@ -1,0 +1,20 @@
+diff --git a/chrome/installer/setup/install_worker.cc b/chrome/installer/setup/install_worker.cc
+index a8e1e6e39477dc789fde5dcd16b4c405f702c56a..fb9d65fd59b9414444840a1a77ebc71fee5896a7 100644
+--- a/chrome/installer/setup/install_worker.cc
++++ b/chrome/installer/setup/install_worker.cc
+@@ -108,6 +108,7 @@ void AddInstallerCopyTasks(const InstallParams& install_params,
+     base::FilePath active_setup_exe(installer_dir.Append(kActiveSetupExe));
+     install_list->AddCopyTreeWorkItem(setup_path, active_setup_exe, temp_path);
+   }
++  BRAVE_ADD_INSTALLER_COPY_TASKS
+ }
+ 
+ // Adds work items to register the Elevation Service with Windows. Only for
+@@ -286,6 +287,7 @@ void AddChromeWorkItems(const InstallParams& install_params,
+         installer_state.GetInstallerDirectory(current_version));
+     base::FilePath old_archive(
+         old_installer_dir.Append(installer::kChromeArchive));
++    BRAVE_MAYBE_ABORT_ADD_CHROME_WORK_ITEMS
+     auto* delete_old_archive_work_item =
+         install_list->AddDeleteTreeWorkItem(old_archive, temp_path);
+     // Don't cause failure of |install_list| if this WorkItem fails.

@@ -1,0 +1,11 @@
+diff --git a/components/vector_icons/aggregate_vector_icons.py b/components/vector_icons/aggregate_vector_icons.py
+index f1bcefd30486ccd68c5739a7df516e8010cdb9d4..22b340f3fe5fa225847631360703c868350ef58a 100644
+--- a/components/vector_icons/aggregate_vector_icons.py
++++ b/components/vector_icons/aggregate_vector_icons.py
+@@ -299,5 +299,6 @@ def main():
+     )
+ 
+ 
++from brave_chromium_utils import inline_chromium_src_override; inline_chromium_src_override(globals(), locals())
+ if __name__ == "__main__":
+     main()

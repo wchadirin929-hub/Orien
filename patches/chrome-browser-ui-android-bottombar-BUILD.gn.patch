@@ -1,0 +1,20 @@
+diff --git a/chrome/browser/ui/android/bottombar/BUILD.gn b/chrome/browser/ui/android/bottombar/BUILD.gn
+index 67375d224b087bd378cdd74b4e3ed2c52ef83dcf..53f1a9f847a03e2978fed559f9533227adf40d7a 100644
+--- a/chrome/browser/ui/android/bottombar/BUILD.gn
++++ b/chrome/browser/ui/android/bottombar/BUILD.gn
+@@ -31,6 +31,7 @@ android_library("config_java") {
+   sources = [ "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarConfigUtils.java" ]
+   deps = [
+     "//base:build_info_java",
++    "//brave/browser/ui/android/bottombar:prefs_java",
+     "//build/android:build_java",
+     "//chrome/browser/flags:java",
+     "//chrome/browser/preferences:java",
+@@ -56,6 +57,7 @@ android_library("metrics_java") {
+ 
+ android_library("java") {
+   sources = [
++    "//brave/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BraveBottomBarButtonManager.java",
+     "java/src/org/chromium/chrome/browser/ui/bottombar/AppMenuActionButtonBinder.java",
+     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBar.java",
+     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarActionEligibility.java",

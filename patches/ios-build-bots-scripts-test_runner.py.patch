@@ -1,0 +1,12 @@
+diff --git a/ios/build/bots/scripts/test_runner.py b/ios/build/bots/scripts/test_runner.py
+index e396b3b90bf9c6ff6832e4edf53f1cfa949d30cc..0074f0d7280a91bc4e09c684720fe7909600c50b 100644
+--- a/ios/build/bots/scripts/test_runner.py
++++ b/ios/build/bots/scripts/test_runner.py
+@@ -445,6 +445,7 @@ class TestRunner(object):
+   @staticmethod
+   def remove_proxy_settings():
+     """removes any proxy settings which may remain from a previous run."""
++    return
+     LOGGER.info('Removing any proxy settings.')
+     network_services = (
+       subprocess.check_output(['networksetup', '-listallnetworkservices'])

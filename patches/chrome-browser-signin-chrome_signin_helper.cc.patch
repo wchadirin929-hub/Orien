@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/signin/chrome_signin_helper.cc b/chrome/browser/signin/chrome_signin_helper.cc
+index 0dc05a33384f83c42dd3d8e1ee866438ff35e89a..c97675de829e72a8b47429d411040cf1a8fd5f4e 100644
+--- a/chrome/browser/signin/chrome_signin_helper.cc
++++ b/chrome/browser/signin/chrome_signin_helper.cc
+@@ -269,6 +269,7 @@ void ProcessMirrorHeader(
+   // Do not allow non-Google origins to open incognito windows.
+   // TODO(crbug.com/40064889): Expand this check to all Mirror headers,
+   //                          regardless of `service_type`.
++  BRAVE_PROCESS_MIRROR_HEADERS_IF_FALSE
+   if (service_type == GAIA_SERVICE_TYPE_INCOGNITO) {
+     GURL initiator_url =
+         request_initiator ? request_initiator->GetURL() : GURL();

@@ -1,0 +1,16 @@
+diff --git a/chrome/browser/file_select_helper.cc b/chrome/browser/file_select_helper.cc
+index bcfed1898edb8eed02c9a44b93a9bbbea622304b..500905bdb9070965b2902fc1dd0bd81f8a5fb181 100644
+--- a/chrome/browser/file_select_helper.cc
++++ b/chrome/browser/file_select_helper.cc
+@@ -519,6 +519,11 @@ void FileSelectHelper::ContentAnalysisCompletionCallback(
+ 
+ void FileSelectHelper::NotifyListenerAndEnd(
+     std::vector<blink::mojom::FileChooserFileInfoPtr> list) {
++  if (brave::MaybeStripImageMetadataForUpload(
++      web_contents_, image_metadata_processed_, list,
++      base::BindOnce(&FileSelectHelper::NotifyListenerAndEnd, this))) {
++    return;
++  }
+   listener_->FileSelected(std::move(list), base_dir_, dialog_mode_);
+   listener_.reset();
+ 

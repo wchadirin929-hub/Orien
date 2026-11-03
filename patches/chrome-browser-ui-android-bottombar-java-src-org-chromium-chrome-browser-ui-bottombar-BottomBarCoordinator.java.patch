@@ -1,0 +1,31 @@
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
+index abae5b65dc70d1631589709a7cefffad2f2bbdb7..aa8cd23abc5adf1b1d861e7938dcea926673315e 100644
+--- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
+@@ -42,7 +42,7 @@ public class BottomBarCoordinator implements BottomBar, Destroyable {
+     private final BottomBarMediator mMediator;
+     private final BottomBarView mView;
+     private final PropertyModelChangeProcessor<PropertyModel, BottomBarView, PropertyKey> mMcp;
+-    private final BottomBarButtonManager mButtonManager;
++    protected final BottomBarButtonManager mButtonManager;
+     private final BottomBarPromoDialogCoordinator mPromoDialogCoordinator;
+     private final NullableObservableSupplier<Tab> mTabSupplier;
+ 
+@@ -85,7 +85,7 @@ public class BottomBarCoordinator implements BottomBar, Destroyable {
+         mModel = new PropertyModel.Builder(BottomBarProperties.ALL_KEYS).build();
+ 
+         mButtonManager =
+-                new BottomBarButtonManager(configs, actionRegistry, mModel, ActionId.NEW_TAB);
++                new BraveBottomBarButtonManager(configs, actionRegistry, mModel, ActionId.NEW_TAB);
+ 
+         mPromoDialogCoordinator =
+                 new BottomBarPromoDialogCoordinator(context, modalDialogManagerSupplier);
+@@ -109,7 +109,7 @@ public class BottomBarCoordinator implements BottomBar, Destroyable {
+         mMcp = PropertyModelChangeProcessor.create(mModel, mView, BottomBarViewBinder::bind);
+     }
+ 
+-    private List<ActionConfig> createActionConfigs(BottomBarView view) {
++    protected List<ActionConfig> createActionConfigs(BottomBarView view) {
+         List<ActionConfig> configs = new ArrayList<>();
+ 
+         BottomBarButtonContainer homeContainer = view.getContainerForAction(ActionId.HOME_BUTTON);

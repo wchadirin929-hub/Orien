@@ -1,0 +1,48 @@
+diff --git a/chrome/browser/ui/views/tabs/common/tab_group_style.cc b/chrome/browser/ui/views/tabs/common/tab_group_style.cc
+index 6df2101c4258aaa903b5cc3e5c492a1d88f3ba8f..37f46a5f76c43b1d18a3071cf15b8393ec5a5626 100644
+--- a/chrome/browser/ui/views/tabs/common/tab_group_style.cc
++++ b/chrome/browser/ui/views/tabs/common/tab_group_style.cc
+@@ -35,6 +35,10 @@ int TabGroupStyle::GetTabGroupOverlapAdjustment() {
+ 
+ // static
+ int TabGroupStyle::GetChipCornerRadius(TabStripOrientation orientation) {
++  if (tabs::HorizontalTabsUpdateEnabled() &&
++      orientation == TabStripOrientation::kHorizontal) {
++    return tabs::kTabBorderRadius;
++  }
+   return orientation == TabStripOrientation::kHorizontal
+              ? kCornerRadius
+              : kVerticalCornerRadius;
+@@ -42,6 +46,9 @@ int TabGroupStyle::GetChipCornerRadius(TabStripOrientation orientation) {
+ 
+ // static
+ int TabGroupStyle::GetEmptyChipSize() {
++  if (tabs::HorizontalTabsUpdateEnabled()) {
++    return tabs::GetHorizontalTabHeight();
++  }
+   return kEmptyChipSize;
+ }
+ 
+@@ -52,6 +59,10 @@ int TabGroupStyle::GetFocusedChipHeight() {
+ 
+ // static
+ gfx::Point TabGroupStyle::GetTitleChipOffset(std::optional<int> chip_height) {
++  if (tabs::HorizontalTabsUpdateEnabled()) {
++    return gfx::Point(tabs::kHorizontalTabInset,
++                      tabs::GetHorizontalTabVerticalSpacing());
++  }
+   const int total_space =
+       GetLayoutConstant(LayoutConstant::kTabStripHeight) -
+       chip_height.value_or(GetEmptyChipSize()) -
+@@ -62,6 +73,11 @@ gfx::Point TabGroupStyle::GetTitleChipOffset(std::optional<int> chip_height) {
+ // static
+ gfx::Insets TabGroupStyle::GetInsetsForHeaderChip(
+     TabStripOrientation orientation) {
++  if (tabs::HorizontalTabsUpdateEnabled() &&
++      orientation == TabStripOrientation::kHorizontal) {
++    return gfx::Insets::VH(tabs::GetTabGroupTitleVerticalInset(),
++                           tabs::GetTabGroupTitleHorizontalInset());
++  }
+   return orientation == TabStripOrientation::kHorizontal
+              ? gfx::Insets::VH(kHeaderChipVerticalInset, kCornerRadius)
+              : gfx::Insets::VH(0, kVerticalHeaderChipHorizontalInset);

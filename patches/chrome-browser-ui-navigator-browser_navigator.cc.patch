@@ -1,0 +1,45 @@
+diff --git a/chrome/browser/ui/navigator/browser_navigator.cc b/chrome/browser/ui/navigator/browser_navigator.cc
+index 1e98a3d7cba4e7913cb67741a36d19c8ce493885..55de53bf1a02f03beb5bb7aaf6a1f17f04cf8ad7 100644
+--- a/chrome/browser/ui/navigator/browser_navigator.cc
++++ b/chrome/browser/ui/navigator/browser_navigator.cc
+@@ -200,6 +200,7 @@ bool ShouldForceCaptivePortalSigninIntoCurrentTab(
+ // Returns true on success. Otherwise, if changing params leads the browser
+ // into an erroneous state, returns false.
+ bool AdjustNavigateParamsForURL(NavigateParams* params) {
++  UpdateParams(params);
+   // Check for some chrome:// pages which we always want to open in a
+   // non-incognito window. Note that even though a ChromeOS guest session is
+   // technically an incognito window, these URLs are allowed.
+@@ -506,7 +507,11 @@ std::unique_ptr<content::WebContents> CreateTargetContents(
+   scoped_refptr<content::SiteInstance> initial_site_instance_for_new_contents =
+       params.opener ? params.opener->GetSiteInstance()
+                     : tab_util::GetSiteInstanceForNewTab(
+-                          params.browser->GetProfile(), url);
++                          params.browser->GetProfile(), url
++#if BUILDFLAG(ENABLE_CONTAINERS)
++                          , GetStoragePartitionConfigToInherit(params)
++#endif  // BUILDFLAG(ENABLE_CONTAINERS)
++);
+ 
+   WebContents::CreateParams create_params(
+       params.browser->GetProfile(), initial_site_instance_for_new_contents);
+@@ -912,6 +917,9 @@ base::WeakPtr<content::NavigationHandle> NavigateImpl(
+          params->user_gesture)) {
+       tab_to_insert->set_opener(
+           tabs::TabInterface::MaybeGetFromContents(params->source_contents));
++      if (params->navigation_initiated_from_sync) {            
++        tab_to_insert->set_opener_was_set_for_empty_new_tab(); 
++      }
+     }
+   }
+ 
+@@ -929,6 +937,9 @@ base::WeakPtr<content::NavigationHandle> NavigateImpl(
+            params->user_gesture)) {
+         tab_to_insert->set_opener(
+             tabs::TabInterface::MaybeGetFromContents(params->source_contents));
++      if (params->navigation_initiated_from_sync) {            
++        tab_to_insert->set_opener_was_set_for_empty_new_tab(); 
++      }
+       }
+       contents_to_navigate_or_insert = tab_to_insert->GetContents();
+ 

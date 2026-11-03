@@ -1,0 +1,20 @@
+diff --git a/chrome/browser/ui/color/BUILD.gn b/chrome/browser/ui/color/BUILD.gn
+index a73bb082108a171f1a3e5506ce99552badf657f5..e36d641be30cf73b86a3a82f4f07df6916be029a 100644
+--- a/chrome/browser/ui/color/BUILD.gn
++++ b/chrome/browser/ui/color/BUILD.gn
+@@ -46,6 +46,7 @@ source_set("mixers") {
+     "tab_strip_color_mixer.cc",
+     "tab_strip_color_mixer.h",
+   ]
++  sources += brave_browser_ui_color_mixers_sources
+ 
+   deps = [
+     ":color_headers",
+@@ -62,6 +63,7 @@ source_set("mixers") {
+     "//ui/color",
+     "//ui/color:mixers",
+   ]
++  deps += brave_browser_ui_color_mixers_deps
+ 
+   if (is_chromeos) {
+     sources += [ "chromeos/native_chrome_color_mixer_chromeos.cc" ]

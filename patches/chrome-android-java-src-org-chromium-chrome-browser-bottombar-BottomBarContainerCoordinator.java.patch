@@ -1,0 +1,21 @@
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/bottombar/BottomBarContainerCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/bottombar/BottomBarContainerCoordinator.java
+index d6aa41a50c946e086e1d4161b29ae3c08b740857..e4df4d85a49ad4afa9fb90b03b3d0f81fe55246f 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/bottombar/BottomBarContainerCoordinator.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/bottombar/BottomBarContainerCoordinator.java
+@@ -4,6 +4,7 @@
+ 
+ package org.chromium.chrome.browser.bottombar;
+ 
++import org.chromium.chrome.browser.ui.bottombar.BraveBottomBarCoordinator;
+ import android.content.ComponentCallbacks;
+ import android.content.Context;
+ import android.content.res.Configuration;
+@@ -124,7 +125,7 @@ public class BottomBarContainerCoordinator
+         mRequestLayerUpdateCallback = requestLayerUpdateCallback;
+ 
+         mBottomBarCoordinator =
+-                new BottomBarCoordinator(
++                new BraveBottomBarCoordinator(
+                         bottomBarContainer,
+                         actionRegistry,
+                         themeColorProvider,

@@ -1,0 +1,10 @@
+diff --git a/chrome/tools/build/mac/BUILD.gn b/chrome/tools/build/mac/BUILD.gn
+index f32945d6d03623cd2741bca53b7b5cbc08bb6d8b..410ac2e54dba1287d9d469367acb8403cb1c738d 100644
+--- a/chrome/tools/build/mac/BUILD.gn
++++ b/chrome/tools/build/mac/BUILD.gn
+@@ -33,4 +33,5 @@ executable("infoplist_strings_util") {
+     deps += [ ":copy_chrome_strings_headers" ]
+     include_dirs = [ "$root_out_dir/infoplist_strings_util_gen" ]
+   }
++  configs += [ "//brave/common:constants_configs($default_toolchain)" ]
+ }

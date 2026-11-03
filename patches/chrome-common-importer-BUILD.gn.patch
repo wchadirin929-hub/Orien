@@ -1,0 +1,20 @@
+diff --git a/chrome/common/importer/BUILD.gn b/chrome/common/importer/BUILD.gn
+index 9aecb7847e3f707853bdc2db0fd05bc41223a0b0..943c0b0fc8725fe311b3905d19ac5e51dbcdd78a 100644
+--- a/chrome/common/importer/BUILD.gn
++++ b/chrome/common/importer/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//brave/common/importer/sources.gni")
+ import("//mojo/public/tools/bindings/mojom.gni")
+ 
+ assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
+@@ -118,6 +119,7 @@ source_set("importer") {
+     "//ui/base",
+     "//url",
+   ]
++  deps += brave_common_importer_deps
+ }
+ 
+ if (!is_android) {

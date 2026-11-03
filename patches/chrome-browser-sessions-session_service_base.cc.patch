@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/sessions/session_service_base.cc b/chrome/browser/sessions/session_service_base.cc
+index 75f43fb8ec025d9bb8c2a88c33f36b3fb85d83a5..69bee2d65d9df97e7d6456f27ce84d06c30c059a 100644
+--- a/chrome/browser/sessions/session_service_base.cc
++++ b/chrome/browser/sessions/session_service_base.cc
+@@ -685,6 +685,7 @@ void SessionServiceBase::BuildCommandsForBrowser(
+     BrowserWindowInterface* browser,
+     IdToRange* tab_to_available_range,
+     std::set<SessionID>* windows_to_track) {
++  BuildCommandsForTreeTab(browser->tab_strip_model(), command_storage_manager());
+   DCHECK(is_saving_enabled_);
+   DCHECK(browser);
+   DCHECK(browser->GetSessionID().is_valid());

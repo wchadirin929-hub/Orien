@@ -1,0 +1,13 @@
+diff --git a/content/browser/gpu/gpu_process_host.cc b/content/browser/gpu/gpu_process_host.cc
+index 1b29f20028bf25a1f6fa1084c05b4917f87313e4..c3e180a8b85a85cb01a1f4835f3e5731078e9e80 100644
+--- a/content/browser/gpu/gpu_process_host.cc
++++ b/content/browser/gpu/gpu_process_host.cc
+@@ -457,6 +457,8 @@ class GpuSandboxedProcessLauncherDelegate
+ 
+     // Block this DLL even if it is not loaded by the browser process.
+     config->AddDllToUnload(L"cmsetac.dll");
++    config->SetShouldPatchModuleFileName(base::FeatureList::IsEnabled(
++        sandbox::policy::features::kModuleFileNamePatch));
+ 
+     return true;
+   }

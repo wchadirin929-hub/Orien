@@ -1,0 +1,13 @@
+diff --git a/front_end/panels/timeline/components/LiveMetricsView.ts b/front_end/panels/timeline/components/LiveMetricsView.ts
+index ba88b2a053f3a82de22f0ebc33a3a5cc5f449542..f7f4efdf76f1eea76882b8151374bde20d2da23b 100644
+--- a/front_end/panels/timeline/components/LiveMetricsView.ts
++++ b/front_end/panels/timeline/components/LiveMetricsView.ts
+@@ -1043,7 +1043,7 @@ export const DEFAULT_VIEW: View = (input, output, target) => {
+         </main>
+         <aside class="next-steps" aria-labelledby="next-steps-section-title">
+           <h2 id="next-steps-section-title" class="section-title">${i18nString(UIStrings.nextSteps)}</h2>
+-          <div id="field-setup" class="settings-card">
++          <div id="field-setup" class="settings-card" hidden="true">
+             <h3 class="card-title">${i18nString(UIStrings.fieldMetricsTitle)}</h3>
+             ${renderFieldDataMessage(input.cruxManager)}
+             ${renderPageScopeSetting(input)}

@@ -1,0 +1,34 @@
+/* Copyright (c) 2022 The Brave Authors. All rights reserved.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at https://mozilla.org/MPL/2.0/. */
+
+#include "chrome/browser/lifetime/browser_close_manager.h"
+
+namespace sidebar {
+
+// Web panels are backed by pinned tabs, so they have to be closed before
+// ProfileManager::ShutdownSessionServices() finalizes the session. Otherwise
+// they come back as ordinary pinned tabs on the next launch. The per-window
+// hook in UnloadController::OnWindowClosing() runs too late here, as quitting
+// shuts the session services down before any window starts closing.
+void CloseAllWebPanelsForShutdown();
+
+}  // namespace sidebar
+
+namespace {
+
+// Whether the browser closing is in-progress or not.
+// Introduced this new flag instead of using browser_shutdown::IsTryingToQuit()
+// because it returns true when all browser windows are closed on Windows/Linux.
+// I assume that the reason is background running on Windows/Linux.
+bool g_browser_closing_started = false;
+
+}  // namespace
+
+#include <chrome/browser/lifetime/browser_close_manager.cc>
+
+// static
+bool BrowserCloseManager::BrowserClosingStarted() {
+  return g_browser_closing_started;
+}

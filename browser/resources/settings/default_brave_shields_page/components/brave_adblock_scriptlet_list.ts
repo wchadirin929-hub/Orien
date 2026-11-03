@@ -1,0 +1,116 @@
+/* Copyright (c) 2024 The Brave Authors. All rights reserved.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at https://mozilla.org/MPL/2.0/. */
+
+import 'chrome://resources/cr_elements/cr_button/cr_button.js'
+import 'chrome://resources/cr_elements/icons.html.js'
+
+import { PrefServiceObserverMixin } from '/shared/settings/prefs2/pref_service_observer_mixin.js'
+import { I18nMixin } from 'chrome://resources/cr_elements/i18n_mixin.js'
+import { PolymerElement } from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js'
+
+import { BaseMixin } from '../../base_mixin.js'
+
+import { getTemplate } from './brave_adblock_scriptlet_list.html.js'
+
+import { loadTimeData } from '../../i18n_setup.js'
+
+import {
+  Scriptlet,
+  BraveAdblockBrowserProxyImpl,
+  ErrorCode
+} from '../brave_adblock_browser_proxy.js'
+
+import './brave_adblock_scriptlet_editor.js'
+
+const AdblockScriptletListBase = PrefServiceObserverMixin(
+  I18nMixin(BaseMixin(PolymerElement))
+)
+
+class AdblockScriptletList extends AdblockScriptletListBase {
+  static get is() {
+    return 'adblock-scriptlet-list'
+  }
+
+  static get template() {
+    return getTemplate()
+  }
+
+  static get properties() {
+    return {
+      customScriptletsList_: {
+        type: Array
+      },
+      editingScriptlet_: Scriptlet,
+      isEditing_: Boolean,
+      developerModePref_: Object
+    }
+  }
+
+  declare customScriptletsList_: Scriptlet[]
+  declare editingScriptlet_: Scriptlet | null
+  declare isEditing_: boolean
+  declare developerModePref_: chrome.settingsPrivate.PrefObject<boolean>
+
+  browserProxy_ = BraveAdblockBrowserProxyImpl.getInstance()
+
+  override connectedCallback() {
+    super.connectedCallback()
+
+    this.mirrorPref('brave.ad_block.developer_mode', 'developerModePref_')
+  }
+
+  override ready() {
+    super.ready()
+
+    if (loadTimeData.getBoolean('shouldExposeElementsForTesting')) {
+      window.testing = window.testing || {};
+      window.testing[`adblockScriptletList`] = this.shadowRoot;
+    }
+
+    this.isEditing_ = false
+    this.browserProxy_.getCustomScriptlets().then((scriptlets) => {
+      this.customScriptletsList_ = scriptlets
+    })
+
+    this.browserProxy_.addWebUiListener(
+      'brave_adblock.onCustomResourcesChanged',
+      () => {
+        this.browserProxy_.getCustomScriptlets().then((value: Scriptlet[]) => {
+          this.customScriptletsList_ = value
+        })
+      },
+    )
+  }
+
+  handleAdd_(_: Event) {
+    this.editingScriptlet_ = new Scriptlet()
+    this.isEditing_ = true
+  }
+
+  handleEdit_(e: Event & {model: {index: number}}) {
+    this.editingScriptlet_ = this.customScriptletsList_[e.model.index]
+    this.isEditing_ = true
+  }
+
+  handleDelete_(e: Event & {model: {index: number}}) {
+    if (!loadTimeData.getBoolean('shouldExposeElementsForTesting')) {
+      const messageText = this.i18n('adblockCustomScriptletDeleteConfirmation')
+      if (!confirm(messageText)) {
+        return
+      }
+    }
+
+    this.browserProxy_.removeCustomScriptlet(
+      this.customScriptletsList_[e.model.index].name,
+    )
+  }
+
+  scriptletEditorClosed_(_: Event) {
+    this.editingScriptlet_ = null
+    this.isEditing_ = false
+  }
+}
+
+customElements.define(AdblockScriptletList.is, AdblockScriptletList)

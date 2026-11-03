@@ -1,0 +1,20 @@
+diff --git a/build/config/android/BUILD.gn b/build/config/android/BUILD.gn
+index 9cd92b1e64d848bba4464ffb107362ec611b29f0..defe2e11544e0217db1f4a321c4c974eb7b50a5a 100644
+--- a/build/config/android/BUILD.gn
++++ b/build/config/android/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//brave/build/config/android/brave_compiler_ldflags.gni")
+ import("//build/config/android/config.gni")
+ import("//build/config/android/rules.gni")
+ import("//build/config/c++/c++.gni")
+@@ -55,6 +56,7 @@ config("compiler") {
+     # segments to be mapped adjacently, which breakpad relies on.
+     "-Wl,-z,max-page-size=$_max_page_size",
+   ]
++  ldflags += brave_build_config_android_compiler_ldflags
+ 
+   if (current_cpu == "arm64") {
+     if (arm_control_flow_integrity == "standard") {

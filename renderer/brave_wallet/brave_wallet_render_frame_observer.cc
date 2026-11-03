@@ -1,0 +1,120 @@
+/* Copyright (c) 2021 The Brave Authors. All rights reserved.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at https://mozilla.org/MPL/2.0/. */
+
+#include "brave/renderer/brave_wallet/brave_wallet_render_frame_observer.h"
+
+#include <utility>
+
+#include "base/check.h"
+#include "base/notreached.h"
+#include "brave/components/brave_wallet/common/common_utils.h"
+#include "brave/components/brave_wallet/renderer/js_cardano_provider.h"
+#include "brave/components/brave_wallet/renderer/js_ethereum_provider.h"
+#include "brave/components/brave_wallet/renderer/js_polkadot_provider.h"
+#include "brave/components/brave_wallet/renderer/js_solana_provider.h"
+#include "brave/components/brave_wallet/renderer/v8_helper.h"
+#include "content/public/renderer/render_frame.h"
+#include "third_party/blink/public/platform/scheduler/web_agent_group_scheduler.h"
+#include "third_party/blink/public/web/web_document.h"
+#include "third_party/blink/public/web/web_local_frame.h"
+#include "url/origin.h"
+#include "v8/include/v8-microtask-queue.h"
+
+namespace brave_wallet {
+
+BraveWalletRenderFrameObserver::BraveWalletRenderFrameObserver(
+    content::RenderFrame* render_frame,
+    GetDynamicParamsCallback get_dynamic_params_callback)
+    : RenderFrameObserver(render_frame),
+      get_dynamic_params_callback_(std::move(get_dynamic_params_callback)) {}
+
+BraveWalletRenderFrameObserver::~BraveWalletRenderFrameObserver() = default;
+
+bool BraveWalletRenderFrameObserver::CanCreateProviders() {
+  auto* web_frame = render_frame()->GetWebFrame();
+
+  // Rejects opaque origins, which includes sandboxed frames without
+  // allow-same-origin.
+  const url::Origin origin = web_frame->GetDocument().GetSecurityOrigin();
+  if (!IsValidDappOrigin(origin)) {
+    return false;
+  }
+
+  // Wallet provider objects should only be created in secure contexts
+  if (!web_frame->GetDocument().IsSecureContext()) {
+    return false;
+  }
+
+  // Scripts can't be executed on provisional frames
+  if (web_frame->IsProvisional()) {
+    return false;
+  }
+
+  // Wallet provider objects are not exposed to third party iframes
+  if (!render_frame()->IsMainFrame() &&
+      web_frame->IsCrossOriginToOutermostMainFrame()) {
+    return false;
+  }
+
+  return true;
+}
+
+void BraveWalletRenderFrameObserver::DidClearWindowObject() {
+  if (!CanCreateProviders()) {
+    return;
+  }
+
+  CHECK(render_frame());
+  v8::Isolate* isolate =
+      render_frame()->GetWebFrame()->GetAgentGroupScheduler()->Isolate();
+  v8::HandleScope handle_scope(isolate);
+  auto* web_frame = render_frame()->GetWebFrame();
+  v8::Local<v8::Context> context = web_frame->MainWorldScriptContext();
+  if (context.IsEmpty()) {
+    return;
+  }
+  v8::MicrotasksScope microtasks(isolate, context->GetMicrotaskQueue(),
+                                 v8::MicrotasksScope::kDoNotRunMicrotasks);
+
+  auto dynamic_params = get_dynamic_params_callback_.Run();
+  if (!dynamic_params.install_window_brave_ethereum_provider &&
+      !dynamic_params.install_window_ethereum_provider &&
+      !dynamic_params.install_window_brave_cardano_provider &&
+      !dynamic_params.install_window_brave_polkadot_provider &&
+      !dynamic_params.brave_use_native_solana_wallet) {
+    return;
+  }
+
+  if (!dynamic_params.install_window_brave_ethereum_provider &&
+      dynamic_params.install_window_ethereum_provider) {
+    NOTREACHED();
+  }
+
+  if (dynamic_params.install_window_brave_ethereum_provider) {
+    JSEthereumProvider::Install(
+        dynamic_params.install_window_ethereum_provider,
+        dynamic_params.allow_overwrite_window_ethereum_provider,
+        render_frame());
+  }
+
+  if (dynamic_params.brave_use_native_solana_wallet) {
+    JSSolanaProvider::Install(
+        dynamic_params.allow_overwrite_window_solana_provider, render_frame());
+  }
+
+  if (dynamic_params.install_window_brave_cardano_provider) {
+    JSCardanoProvider::Install(render_frame());
+  }
+
+  if (dynamic_params.install_window_brave_polkadot_provider) {
+    JSPolkadotProvider::Install(render_frame());
+  }
+}
+
+void BraveWalletRenderFrameObserver::OnDestruct() {
+  delete this;
+}
+
+}  // namespace brave_wallet

@@ -1,0 +1,28 @@
+diff --git a/chrome/browser/ui/tabs/public/tab_features.h b/chrome/browser/ui/tabs/public/tab_features.h
+index a22dcb9e9463b1d02e7bbe9b4a7db27afa8ed3f6..b41f41225a483d55cccfe65bc79ae6ee32ef8a63 100644
+--- a/chrome/browser/ui/tabs/public/tab_features.h
++++ b/chrome/browser/ui/tabs/public/tab_features.h
+@@ -409,7 +409,7 @@ class TabInterface;
+ class TabFeatures {
+  public:
+   TabFeatures();
+-  ~TabFeatures();
++  virtual ~TabFeatures();
+ 
+   TabFeatures(const TabFeatures&) = delete;
+   TabFeatures& operator=(const TabFeatures&) = delete;
+@@ -547,12 +547,13 @@ class TabFeatures {
+   }
+ 
+   // Called exactly once to initialize features.
+-  void Init(TabInterface& tab, Profile* profile);
++  virtual void Init(TabInterface& tab, Profile* profile);
+ 
+   static ui::UserDataFactoryWithOwner<TabInterface>&
+   GetUserDataFactoryForTesting();
+ 
+  private:
++  friend class BraveTabFeatures;
+   bool initialized_ = false;
+ 
+   // Returns the factory used to create owned components.

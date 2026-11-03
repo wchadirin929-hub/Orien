@@ -1,0 +1,14 @@
+diff --git a/android_webview/browser/aw_web_contents_delegate.cc b/android_webview/browser/aw_web_contents_delegate.cc
+index e0a135ab9147f7a91488ddec2f7e2603d0a3295d..401ca518c0846d3dce86098bcf0a0bf5fb86e728 100644
+--- a/android_webview/browser/aw_web_contents_delegate.cc
++++ b/android_webview/browser/aw_web_contents_delegate.cc
+@@ -279,6 +279,9 @@ bool AwWebContentsDelegate::CheckMediaAccessPermission(
+     content::RenderFrameHost* render_frame_host,
+     const url::Origin& security_origin,
+     blink::mojom::MediaStreamType type) {
++  if ((true)) {
++    return false;
++  }
+   WebContents* web_contents =
+       WebContents::FromRenderFrameHost(render_frame_host);
+   if (!web_contents) {

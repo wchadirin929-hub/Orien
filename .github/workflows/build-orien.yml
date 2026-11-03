@@ -1,0 +1,121 @@
+name: Build Orien Browser (Portable Windows x64)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+jobs:
+  build-windows:
+    name: Build Orien Portable (Windows x64)
+    runs-on: windows-2022
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout Orien Source Code
+        uses: actions/checkout@v4
+        with:
+          path: src/brave
+
+      - name: Maximize Windows Runner Disk Space
+        shell: pwsh
+        run: |
+          Write-Host "Freeing disk space on runner..."
+          $pathsToRemove = @(
+            "C:\Program Files\Android",
+            "C:\Android",
+            "C:\Program Files (x86)\Android",
+            "C:\hostedtoolcache\windows\Ruby",
+            "C:\hostedtoolcache\windows\Java",
+            "C:\hostedtoolcache\windows\go"
+          )
+          foreach ($p in $pathsToRemove) {
+            if (Test-Path $p) {
+              Write-Host "Removing $p"
+              Remove-Item -Recurse -Force $p -ErrorAction SilentlyContinue
+            }
+          }
+          Get-PSDrive C
+
+      - name: Setup Node.js & pnpm
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        shell: pwsh
+        run: npm install -g pnpm
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Google depot_tools
+        shell: pwsh
+        run: |
+          git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git C:\depot_tools
+          echo "C:\depot_tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Initialize & Sync Dependencies
+        working-directory: src/brave
+        shell: cmd
+        run: |
+          set PATH=C:\depot_tools;%PATH%
+          set DEPOT_TOOLS_WIN_TOOLCHAIN=0
+          call pnpm install --frozen-lockfile --yes
+          node ./build/commands/scripts/sync.ts --init --no-history --lean_sync
+
+      - name: Generate GN Build Files (Release Mode)
+        working-directory: src/brave
+        shell: cmd
+        run: |
+          set PATH=C:\depot_tools;%PATH%
+          set DEPOT_TOOLS_WIN_TOOLCHAIN=0
+          call pnpm run gn -- gen out/Release --args="is_official_build=true is_debug=false symbol_level=0 blink_symbol_level=0 is_component_build=false"
+
+      - name: Compile Orien Browser
+        working-directory: src/brave
+        shell: cmd
+        run: |
+          set PATH=C:\depot_tools;%PATH%
+          set DEPOT_TOOLS_WIN_TOOLCHAIN=0
+          ninja -C out/Release brave
+
+      - name: Package Portable Orien Browser
+        shell: pwsh
+        run: |
+          $outDir = "src/brave/out/Release"
+          if (!(Test-Path $outDir)) { $outDir = "out/Release" }
+          $distDir = "Orien-Portable-Windows-x64"
+          New-Item -ItemType Directory -Path $distDir -Force | Out-Null
+          
+          Copy-Item -Path "$outDir\*.exe" -Destination $distDir -Force -ErrorAction SilentlyContinue
+          Copy-Item -Path "$outDir\*.dll" -Destination $distDir -Force -ErrorAction SilentlyContinue
+          Copy-Item -Path "$outDir\*.pak" -Destination $distDir -Force -ErrorAction SilentlyContinue
+          Copy-Item -Path "$outDir\*.bin" -Destination $distDir -Force -ErrorAction SilentlyContinue
+          Copy-Item -Path "$outDir\icudtl.dat" -Destination $distDir -Force -ErrorAction SilentlyContinue
+          if (Test-Path "$outDir\locales") { Copy-Item -Path "$outDir\locales" -Destination $distDir -Recurse -Force }
+          if (Test-Path "$outDir\resources") { Copy-Item -Path "$outDir\resources" -Destination $distDir -Recurse -Force }
+
+          $launcherScript = @"
+          @echo off
+          title Starting Orien Browser Portable...
+          start "" "%~dp0orien.exe" --user-data-dir="%~dp0User_Data" %*
+          "@
+          Set-Content -Path "$distDir\Buka-Orien.bat" -Value $launcherScript
+
+          Compress-Archive -Path "$distDir\*" -DestinationPath "Orien-Browser-Portable-Windows-x64.zip" -CompressionLevel Optimal
+
+      - name: Upload Orien Portable Zip to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Orien-Browser-Portable-Windows-x64
+          path: Orien-Browser-Portable-Windows-x64.zip
+          retention-days: 14

@@ -1,0 +1,53 @@
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/sync/settings/ManageSyncSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/sync/settings/ManageSyncSettings.java
+index c3ed0793ee4ecbc5aa65e547152b627ca6b3f873..c1b13d5824750809fd097c773975bf8efaf623f4 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/sync/settings/ManageSyncSettings.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/sync/settings/ManageSyncSettings.java
+@@ -209,10 +209,10 @@ public class ManageSyncSettings extends ChromeBaseSettingsFragment
+     private boolean mShouldUpdatePrefs;
+ 
+     /** Maps {@link UserSelectableType} to the corresponding preference. */
+-    private Map<Integer, ChromeSwitchPreference> mSyncTypeSwitchPreferencesMap = new HashMap<>();
++    protected Map<Integer, ChromeSwitchPreference> mSyncTypeSwitchPreferencesMap = new HashMap<>();
+ 
+-    private Preference mGoogleActivityControls;
+-    private Preference mSyncEncryption;
++    protected Preference mGoogleActivityControls;
++    protected Preference mSyncEncryption;
+     private @Nullable SignoutButtonPreference mSignOutPreference;
+ 
+     private final SettableMonotonicObservableSupplier<String> mPageTitle =
+@@ -321,6 +321,7 @@ public class ManageSyncSettings extends ChromeBaseSettingsFragment
+ 
+     @Override
+     public boolean onPreferenceChange(Preference preference, Object newValue) {
++        if (false)  // Suppress the "addresses not encrypted" warning (not applicable to Brave's sync model).
+         if (mSyncService.isUsingExplicitPassphrase()
+                 && preference
+                         .getKey()
+@@ -394,6 +395,9 @@ public class ManageSyncSettings extends ChromeBaseSettingsFragment
+         CentralAccountCardPreference centralAccountCardPreference =
+                 findPreference(PREF_CENTRAL_ACCOUNT_CARD_PREFERENCE);
+         IdentityManager identityManager = getIdentityManager(profile);
++        if (identityManager.getPrimaryAccountInfo() == null) {
++            return;
++        }
+         centralAccountCardPreference.initialize(
+                 assumeNonNull(identityManager.getPrimaryAccountInfo()),
+                 ProfileDataCache.createWithDefaultImageSizeAndNoBadge(
+@@ -586,7 +590,7 @@ public class ManageSyncSettings extends ChromeBaseSettingsFragment
+      * this state.
+      */
+     private void updateSyncPreferences() {
+-        @Nullable AccountInfo primaryAccount = getIdentityManager().getPrimaryAccountInfo();
++        @Nullable AccountInfo primaryAccount = new AccountInfo.Builder("", new org.chromium.google_apis.gaia.GaiaId("")).build();
+         // May happen if account is removed from the device while this screen is shown.
+         if (primaryAccount == null) {
+             finishCurrentSettings();
+@@ -1022,6 +1026,7 @@ public class ManageSyncSettings extends ChromeBaseSettingsFragment
+ 
+     /** Whether there is no primary account, leaving this page with nothing to describe. */
+     private boolean isSignedOut() {
++        if (true) return false;  // Brave Sync never has a Chromium primary account.
+         return !getIdentityManager().hasPrimaryAccount();
+     }
+ 

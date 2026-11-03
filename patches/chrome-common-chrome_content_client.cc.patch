@@ -1,0 +1,21 @@
+diff --git a/chrome/common/chrome_content_client.cc b/chrome/common/chrome_content_client.cc
+index 601ff3ce617e212d57e59aa24e023a8a506da6f9..ddc2edb93948720dbd8d4e658085f3386cdc0042 100644
+--- a/chrome/common/chrome_content_client.cc
++++ b/chrome/common/chrome_content_client.cc
+@@ -121,6 +121,7 @@ void ChromeContentClient::SetGpuInfo(const gpu::GPUInfo& gpu_info) {
+ 
+ void ChromeContentClient::AddPlugins(
+     std::vector<content::WebPluginInfo>* plugins) {
++  [&]() -> void {
+ #if BUILDFLAG(ENABLE_PDF)
+ #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
+   static constexpr char16_t kPDFPluginName[] = u"Chrome PDF Plugin";
+@@ -146,6 +147,8 @@ void ChromeContentClient::AddPlugins(
+   pdf_info.type = content::WebPluginInfo::PLUGIN_TYPE_BROWSER_INTERNAL_PLUGIN;
+   plugins->push_back(pdf_info);
+ #endif  // BUILDFLAG(ENABLE_PDF)
++  }();
++  RenameChromiumPdfPluginToChrome(plugins);
+ }
+ 
+ void ChromeContentClient::AddContentDecryptionModules(

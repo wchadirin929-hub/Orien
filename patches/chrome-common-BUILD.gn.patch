@@ -1,0 +1,60 @@
+diff --git a/chrome/common/BUILD.gn b/chrome/common/BUILD.gn
+index 6f5f891dc689a2e7628cf731b7863264cc0ac0ab..7b697c06b9b787ba0249c9fa82de092a87970eb8 100644
+--- a/chrome/common/BUILD.gn
++++ b/chrome/common/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//brave/common/sources.gni")
+ import("//build/buildflag_header.gni")
+ import("//build/config/chrome_build.gni")
+ import("//build/util/process_version.gni")
+@@ -88,6 +89,7 @@ source_set("channel_info") {
+   deps = [ "//build:branding_buildflags" ]
+   public_deps = [
+     "//base",
++    "//brave/common:channel_info",
+     "//components/version_info",
+     "//components/version_info:version_string",
+   ]
+@@ -174,6 +176,7 @@ static_library("common_lib") {
+     "webui_util.cc",
+     "webui_util.h",
+   ]
++  sources += brave_chrome_common_sources
+   defines = []
+ 
+   configs += [ "//build/config:precompiled_headers" ]
+@@ -261,6 +264,7 @@ static_library("common_lib") {
+     "//ui/resources",
+     "//url",
+   ]
++  public_deps += brave_chrome_common_public_deps
+ 
+   deps = [
+     "//components/cdm/common:buildflags",
+@@ -276,6 +280,7 @@ static_library("common_lib") {
+     "//components/pdf/common:constants",
+     "//components/pdf/common:util",
+   ]
++  deps += brave_chrome_common_deps
+ 
+   if (is_mac || is_win || is_linux || is_chromeos) {
+     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
+@@ -486,6 +491,7 @@ static_library("non_code_constants") {
+   if (is_chromeos) {
+     deps += [ "//ash/constants" ]
+   }
++  configs += [ "//brave/common:constants_configs" ]
+ }
+ 
+ component("chrome_features") {
+@@ -588,6 +594,7 @@ static_library("constants") {
+     "//printing/buildflags",
+     "//third_party/widevine/cdm:buildflags",
+   ]
++  deps += brave_chrome_constants_deps
+ 
+   if (is_android) {
+     sources += [ "chrome_paths_android.cc" ]

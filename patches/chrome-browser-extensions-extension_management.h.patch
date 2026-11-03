@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/extensions/extension_management.h b/chrome/browser/extensions/extension_management.h
+index 54c0de1feba723af0d586db6d62cab5059b4eeec..5e6bb8ff664385630d6bfe60ca9cfb45adc2b53d 100644
+--- a/chrome/browser/extensions/extension_management.h
++++ b/chrome/browser/extensions/extension_management.h
+@@ -284,6 +284,7 @@ class ExtensionManagement : public KeyedService,
+   }
+ 
+  private:
++  friend class BraveExtensionManagement;
+   using SettingsIdMap =
+       base::flat_map<ExtensionId,
+                      std::unique_ptr<internal::IndividualSettings>>;

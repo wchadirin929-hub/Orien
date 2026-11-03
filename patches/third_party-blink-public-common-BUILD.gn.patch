@@ -1,0 +1,20 @@
+diff --git a/third_party/blink/public/common/BUILD.gn b/third_party/blink/public/common/BUILD.gn
+index 4bfe6acbca1174ae35aaa8e8a1074436a940ba44..feb7a79bff1960b071aeb24f7577879f16722370 100644
+--- a/third_party/blink/public/common/BUILD.gn
++++ b/third_party/blink/public/common/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//brave/third_party/blink/public/common/sources.gni")
+ import("//build/buildflag_header.gni")
+ import("//build/config/compiler/compiler.gni")
+ import("//build/config/features.gni")
+@@ -357,6 +358,7 @@ source_set("headers") {
+     "//net",
+     "//ui/base",
+   ]
++  deps += brave_blink_public_common_deps
+ 
+   # Chromium without blink doesn't use and must not depend on //media
+   if (use_blink) {

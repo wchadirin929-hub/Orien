@@ -1,0 +1,14 @@
+diff --git a/chrome/browser/ui/views/page_info/page_info_view_factory.cc b/chrome/browser/ui/views/page_info/page_info_view_factory.cc
+index d5a310459999ecbd0370825baaa1ca70d33d41a3..e4ad4533ac7cd107b90f4e8656ebefaaba61d41a 100644
+--- a/chrome/browser/ui/views/page_info/page_info_view_factory.cc
++++ b/chrome/browser/ui/views/page_info/page_info_view_factory.cc
+@@ -641,6 +641,9 @@ const ui::ImageModel PageInfoViewFactory::GetPermissionIcon(
+ 
+   icon = &gfx::VectorIcon::EmptyIcon();
+   switch (permission.type) {
++    case ContentSettingsType::AUTOPLAY:
++      icon = &kAutoplayStatusIcon;
++      break;
+     case ContentSettingsType::COOKIES:
+       icon =
+           &(features::IsRoundedIconsEnabled() ? vector_icons::kDatabaseIcon

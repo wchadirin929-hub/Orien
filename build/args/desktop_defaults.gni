@@ -1,0 +1,42 @@
+# Copyright (c) 2025 The Brave Authors. All rights reserved.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at https://mozilla.org/MPL/2.0/.
+
+# This file contains defaults for gn values in Chromium which are always
+# overridden in Brave builds. This file in particular is only included in
+# builds for non-mobile builds (mac, linux, win)
+
+safe_browsing_mode = 1
+
+# Super lightweight / debloated build configuration:
+# 1. AI and Assistant features
+enable_ai_chat = false
+enable_local_ai = false
+
+# 2. Crypto, Web3, and Wallets
+enable_brave_wallet = false
+
+# 3. VPN
+enable_brave_vpn_v1 = false
+enable_brave_vpn_v2 = false
+
+# 4. Ads, Rewards, and News
+enable_brave_rewards = false
+enable_brave_ads = false
+enable_brave_news = false
+
+# 5. Background integrations and auxiliary features
+enable_brave_talk = false
+enable_tor = false
+enable_speedreader = false
+enable_web_discovery = false
+enable_web_discovery_native = false
+enable_email_aliases = false
+enable_brave_wayback_machine = false
+enable_playlist = false
+enable_brave_education = false
+enable_brave_stats_updater = false
+enable_psst = false
+enable_commander = false
+enable_text_recognition = false

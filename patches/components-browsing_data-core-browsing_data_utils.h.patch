@@ -1,0 +1,17 @@
+diff --git a/components/browsing_data/core/browsing_data_utils.h b/components/browsing_data/core/browsing_data_utils.h
+index 43b2630229faad14a4216b991961c9ad24b6abd5..4f2a3e4fc5e012dc1e51f0742438868e2462c797 100644
+--- a/components/browsing_data/core/browsing_data_utils.h
++++ b/components/browsing_data/core/browsing_data_utils.h
+@@ -40,7 +40,12 @@ enum class BrowsingDataType {
+   TABS = 8,
+   // Only for Desktop:
+   SKILLS = 9,
++#if BUILDFLAG(ENABLE_AI_CHAT)
++  BRAVE_AI_CHAT = SKILLS + 1,
++  MAX_VALUE = BRAVE_AI_CHAT,
++#else
+   MAX_VALUE = SKILLS,
++#endif
+ };
+ // LINT.ThenChange(/chrome/browser/resources/settings/clear_browsing_data_dialog/clear_browsing_data_browser_proxy.ts:BrowsingDataType)
+ 

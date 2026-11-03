@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/resources/settings/privacy_page/privacy_page.ts b/chrome/browser/resources/settings/privacy_page/privacy_page.ts
+index b3ecabfb8fd6fb2f461004a4232a3f504148bd63..1b606e7bd1bb4fdd66a49dd175b0c316a7f52dd9 100644
+--- a/chrome/browser/resources/settings/privacy_page/privacy_page.ts
++++ b/chrome/browser/resources/settings/privacy_page/privacy_page.ts
+@@ -7,6 +7,7 @@
+  * 'settings-privacy-page' is the settings page containing privacy and
+  * security settings.
+  */
++import './personalization_options.js';
+ import 'chrome://resources/cr_elements/icons.html.js';
+ import 'chrome://resources/cr_elements/cr_link_row/cr_link_row.js';
+ import 'chrome://resources/cr_elements/cr_toast/cr_toast.js';

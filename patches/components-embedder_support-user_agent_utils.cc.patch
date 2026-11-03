@@ -1,0 +1,25 @@
+diff --git a/components/embedder_support/user_agent_utils.cc b/components/embedder_support/user_agent_utils.cc
+index bf4a8960a0d6cd2268b5a497edcdd761a1b67360..de402f969eff2a2238f49faee73ce5d7b40b9177 100644
+--- a/components/embedder_support/user_agent_utils.cc
++++ b/components/embedder_support/user_agent_utils.cc
+@@ -162,10 +162,11 @@ const blink::UserAgentBrandList GetUserAgentBrandList(
+ #if !BUILDFLAG(CHROMIUM_BRANDING)
+   brand = version_info::GetProductName();
+ #endif
++  BRAVE_GET_USER_AGENT_BRAND_LIST
+ 
+   std::string brand_version =
+       output_version_type == blink::UserAgentBrandVersionType::kFullVersion
+-          ? full_version
++          ? BRAVE_BRAND_VERSION_OVERRIDE_FOR_FULL_BRAND_VERSION_TYPE
+           : major_version;
+ 
+   return GenerateBrandVersionList(major_version_number, brand, brand_version,
+@@ -854,6 +855,7 @@ std::string GetAndroidOSInfo(
+ 
+   // Send information about the device.
+   bool semicolon_inserted = false;
++  BRAVE_GET_ANDROID_OS_INFO
+   if (include_android_model == IncludeAndroidModel::Include) {
+     std::string android_device_name = BuildModelInfo();
+     if (!android_device_name.empty()) {

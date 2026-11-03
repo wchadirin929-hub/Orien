@@ -1,0 +1,12 @@
+diff --git a/chrome/browser/enterprise/platform_auth/platform_auth_navigation_throttle.cc b/chrome/browser/enterprise/platform_auth/platform_auth_navigation_throttle.cc
+index 70d38d2aacbc6f103c238505c0eac559f183cf6d..26ddf2d385fd65b677a3a72a7bdde3c79bca8dcb 100644
+--- a/chrome/browser/enterprise/platform_auth/platform_auth_navigation_throttle.cc
++++ b/chrome/browser/enterprise/platform_auth/platform_auth_navigation_throttle.cc
+@@ -14,6 +14,7 @@ namespace enterprise_auth {
+ // static
+ void PlatformAuthNavigationThrottle::MaybeCreateAndAdd(
+     content::NavigationThrottleRegistry& registry) {
++  if (brave::ShouldSkipPlatformAuth(registry)) return;
+   // The manager is enabled when both the feature and policy are enabled.
+   // If the manager is not enabled, there is no point in creating a throttle
+   // since no auth data can be fetched.
