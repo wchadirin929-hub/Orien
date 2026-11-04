@@ -38,7 +38,6 @@ enable_playlist = false
 enable_brave_education = false
 enable_brave_stats_updater = false
 enable_psst = false
-enable_commander = false
 enable_text_recognition = false
 
 # 6. Service keys (prevent is_official_build assertions)
