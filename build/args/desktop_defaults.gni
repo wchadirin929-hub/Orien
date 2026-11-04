@@ -32,7 +32,6 @@ enable_tor = false
 enable_speedreader = false
 enable_web_discovery = false
 enable_web_discovery_native = false
-enable_email_aliases = false
 enable_brave_wayback_machine = false
 enable_playlist = false
 enable_brave_education = false

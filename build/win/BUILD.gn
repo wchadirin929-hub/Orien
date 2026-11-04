@@ -3,6 +3,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at https://mozilla.org/MPL/2.0/.
 
+import("//brave/build/config.gni")
 import("//brave/components/brave_vpn/common/buildflags/buildflags.gni")
 import("sign.gni")
 
@@ -11,6 +12,12 @@ group("brave") {
     ":copy_exe",
     ":copy_pdb",
   ]
+  if (brave_exe != "brave.exe") {
+    public_deps += [
+      ":copy_brave_exe_compat",
+      ":copy_brave_pdb_compat",
+    ]
+  }
   if (enable_brave_vpn_v1) {
     deps = [
       "//brave/browser/brave_vpn/win/brave_vpn_helper",
@@ -22,7 +29,7 @@ group("brave") {
 copy("copy_exe") {
   sources = [ "$root_out_dir/chrome.exe" ]
 
-  outputs = [ "$root_out_dir/brave.exe" ]
+  outputs = [ "$root_out_dir/$brave_exe" ]
 
   deps = [ "//chrome:reorder_imports" ]
 }
@@ -30,9 +37,27 @@ copy("copy_exe") {
 copy("copy_pdb") {
   sources = [ "$root_out_dir/chrome.exe.pdb" ]
 
-  outputs = [ "$root_out_dir/brave.exe.pdb" ]
+  outputs = [ "$root_out_dir/$brave_exe.pdb" ]
 
   deps = [ "//chrome:reorder_imports" ]
+}
+
+if (brave_exe != "brave.exe") {
+  copy("copy_brave_exe_compat") {
+    sources = [ "$root_out_dir/chrome.exe" ]
+
+    outputs = [ "$root_out_dir/brave.exe" ]
+
+    deps = [ "//chrome:reorder_imports" ]
+  }
+
+  copy("copy_brave_pdb_compat") {
+    sources = [ "$root_out_dir/chrome.exe.pdb" ]
+
+    outputs = [ "$root_out_dir/brave.exe.pdb" ]
+
+    deps = [ "//chrome:reorder_imports" ]
+  }
 }
 
 sign("create_signed_installer") {
