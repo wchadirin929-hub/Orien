@@ -121,6 +121,9 @@ jobs:
           set PATH=C:\depot_tools;%PATH%
           set DEPOT_TOOLS_WIN_TOOLCHAIN=0
           set NODE_OPTIONS=--experimental-strip-types
+          set brave_services_key=dummy_orien_services_key
+          set service_key_search=dummy_orien_search_key
+          set service_key_stt=dummy_orien_stt_key
           call pnpm run build Release
 
       - name: Package Portable Orien Browser

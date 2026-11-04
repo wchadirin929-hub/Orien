@@ -40,3 +40,8 @@ enable_brave_stats_updater = false
 enable_psst = false
 enable_commander = false
 enable_text_recognition = false
+
+# 6. Service keys (prevent is_official_build assertions)
+brave_services_key = "dummy_orien_services_key"
+service_key_search = "dummy_orien_search_key"
+service_key_stt = "dummy_orien_stt_key"
