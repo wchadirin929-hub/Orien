@@ -77,7 +77,7 @@ jobs:
           set PATH=C:\depot_tools;%PATH%
           set DEPOT_TOOLS_WIN_TOOLCHAIN=0
           set NODE_OPTIONS=--experimental-strip-types
-          call pnpm install --frozen-lockfile --yes --runtime-on-fail=ignore
+          call pnpm install
           node ./build/commands/scripts/sync.ts --init --no-history --lean_sync
 
       - name: Compile Orien Browser (Release Mode)
