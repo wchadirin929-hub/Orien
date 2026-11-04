@@ -17,6 +17,10 @@ jobs:
     timeout-minutes: 360
 
     steps:
+      - name: Configure Git Line Endings (Disable AutoCRLF)
+        shell: pwsh
+        run: git config --global core.autocrlf false
+
       - name: Checkout Orien Source Code
         uses: actions/checkout@v4
         with:
