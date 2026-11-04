@@ -74,6 +74,36 @@ jobs:
           echo "C:\depot_tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+      - name: Fix Windows SDK Toolchain Paths
+        shell: pwsh
+        run: |
+          $kitsRoot = "C:\Program Files (x86)\Windows Kits\10"
+          $validSdk = Get-ChildItem -Path "$kitsRoot\include" -Directory | 
+              Where-Object { Test-Path "$($_.FullName)\um" } | 
+              Sort-Object Name -Descending | 
+              Select-Object -First 1 -ExpandProperty Name
+          Write-Host "Found valid Windows SDK: $validSdk"
+
+          $targetVersions = @("10.0.28000.0", "10.0.26100.0", "10.0.22621.0")
+          foreach ($targetVersion in $targetVersions) {
+              foreach ($dir in @("include", "Lib", "bin")) {
+                  $targetPath = "$kitsRoot\$dir\$targetVersion"
+                  $sourcePath = "$kitsRoot\$dir\$validSdk"
+                  if (Test-Path $sourcePath) {
+                      if (Test-Path $targetPath) {
+                          if (-not (Test-Path "$targetPath\um") -and -not (Test-Path "$targetPath\ucrt") -and ($targetPath -ne $sourcePath)) {
+                              Remove-Item -Recurse -Force $targetPath -ErrorAction SilentlyContinue
+                              cmd /c mklink /J "$targetPath" "$sourcePath"
+                          }
+                      } else {
+                          cmd /c mklink /J "$targetPath" "$sourcePath"
+                      }
+                  }
+              }
+          }
+          Write-Host "Verifying SDK directories:"
+          Get-ChildItem -Path "$kitsRoot\include" | Select-Object Name
+
       - name: Initialize & Sync Dependencies
         working-directory: src/brave
         shell: cmd
