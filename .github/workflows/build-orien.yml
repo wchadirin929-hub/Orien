@@ -22,6 +22,12 @@ jobs:
         with:
           path: src/brave
 
+      - name: Enable Windows Developer Mode & Long Paths
+        shell: cmd
+        run: |
+          reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"
+          reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem" /t REG_DWORD /f /v "LongPathsEnabled" /d "1"
+
       - name: Maximize Windows Runner Disk Space
         shell: pwsh
         run: |
@@ -42,14 +48,15 @@ jobs:
           }
           Get-PSDrive C
 
-      - name: Setup Node.js & pnpm
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24'
 
-      - name: Install pnpm
-        shell: pwsh
-        run: npm install -g pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -69,30 +76,29 @@ jobs:
         run: |
           set PATH=C:\depot_tools;%PATH%
           set DEPOT_TOOLS_WIN_TOOLCHAIN=0
-          call pnpm install --frozen-lockfile --yes
+          set NODE_OPTIONS=--experimental-strip-types
+          call pnpm install --frozen-lockfile --yes --runtime-on-fail=ignore
           node ./build/commands/scripts/sync.ts --init --no-history --lean_sync
 
-      - name: Generate GN Build Files (Release Mode)
+      - name: Compile Orien Browser (Release Mode)
         working-directory: src/brave
         shell: cmd
         run: |
           set PATH=C:\depot_tools;%PATH%
           set DEPOT_TOOLS_WIN_TOOLCHAIN=0
-          call pnpm run gn -- gen out/Release --args="is_official_build=true is_debug=false symbol_level=0 blink_symbol_level=0 is_component_build=false"
-
-      - name: Compile Orien Browser
-        working-directory: src/brave
-        shell: cmd
-        run: |
-          set PATH=C:\depot_tools;%PATH%
-          set DEPOT_TOOLS_WIN_TOOLCHAIN=0
-          ninja -C out/Release brave
+          set NODE_OPTIONS=--experimental-strip-types
+          call pnpm run build Release
 
       - name: Package Portable Orien Browser
         shell: pwsh
         run: |
-          $outDir = "src/brave/out/Release"
-          if (!(Test-Path $outDir)) { $outDir = "out/Release" }
+          $candidates = @("src/out/Release", "src/brave/out/Release", "out/Release")
+          $outDir = $candidates | Where-Object { Test-Path "$_\brave.exe" -or Test-Path "$_\orien.exe" -or (Test-Path "$_\chrome.exe") } | Select-Object -First 1
+          if (-not $outDir) {
+            $outDir = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          }
+          Write-Host "Packaging from outDir: $outDir"
+
           $distDir = "Orien-Portable-Windows-x64"
           New-Item -ItemType Directory -Path $distDir -Force | Out-Null
           
@@ -104,10 +110,22 @@ jobs:
           if (Test-Path "$outDir\locales") { Copy-Item -Path "$outDir\locales" -Destination $distDir -Recurse -Force }
           if (Test-Path "$outDir\resources") { Copy-Item -Path "$outDir\resources" -Destination $distDir -Recurse -Force }
 
+          if ((Test-Path "$distDir\brave.exe") -and (-not (Test-Path "$distDir\orien.exe"))) {
+            Copy-Item -Path "$distDir\brave.exe" -Destination "$distDir\orien.exe" -Force
+          }
+
           $launcherScript = @"
           @echo off
-          title Starting Orien Browser Portable...
-          start "" "%~dp0orien.exe" --user-data-dir="%~dp0User_Data" %*
+          title Membuka Orien Browser Portable...
+          cd /d "%~dp0"
+          if exist "orien.exe" (
+              start "" "%~dp0orien.exe" --user-data-dir="%~dp0User_Data" %*
+          ) else if exist "brave.exe" (
+              start "" "%~dp0brave.exe" --user-data-dir="%~dp0User_Data" %*
+          ) else (
+              echo [ERROR] File executable Orien tidak ditemukan!
+              pause
+          )
           "@
           Set-Content -Path "$distDir\Buka-Orien.bat" -Value $launcherScript
 
