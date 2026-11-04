@@ -45,3 +45,4 @@ enable_text_recognition = false
 brave_services_key = "dummy_orien_services_key"
 service_key_search = "dummy_orien_search_key"
 service_key_stt = "dummy_orien_stt_key"
+service_key_aichat = "dummy_orien_aichat_key"
