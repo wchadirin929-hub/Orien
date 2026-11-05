@@ -162,14 +162,6 @@ jobs:
               Set-Content -Path $_.FullName -Value $content
           }
 
-          # 3. Patch timestamp.gni
-          Get-ChildItem -Path "src" -Recurse -Filter "timestamp.gni" | ForEach-Object {
-              Write-Host "Patching build_timestamp in $($_.FullName)..."
-              $content = Get-Content $_.FullName -Raw
-              $content = $content -replace 'build_timestamp\s*=.*', "build_timestamp = `"$epoch`""
-              Set-Content -Path $_.FullName -Value $content
-          }
-
       - name: Compile Orien Browser (Release Mode)
         working-directory: src/brave
         shell: cmd
