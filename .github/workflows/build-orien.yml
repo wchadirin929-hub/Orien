@@ -183,6 +183,14 @@ jobs:
               Write-Host "Warning: $clangPath not found!"
           }
 
+          # 4. Verify vendored crates integrity
+          $tarLock = "src/brave/tools/crates/vendor/tar/Cargo.lock"
+          if (Test-Path $tarLock) {
+              Write-Host "Verified $tarLock exists (size: $((Get-Item $tarLock).Length) bytes)"
+          } else {
+              Write-Host "WARNING: $tarLock is missing!"
+          }
+
       - name: Compile Orien Browser (Release Mode)
         working-directory: src/brave
         shell: cmd
