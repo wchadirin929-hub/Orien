@@ -162,6 +162,22 @@ jobs:
               Set-Content -Path $_.FullName -Value $content
           }
 
+          # 3. Setup Clang-cl redirect_cc wrapper for all chromium_src overrides
+          $clangPath = "src/third_party/llvm-build/Release+Asserts/bin/clang-cl.exe"
+          if (Test-Path $clangPath) {
+              Write-Host "Installing redirect_cc wrapper into $clangPath..."
+              $clangDir = Split-Path $clangPath
+              $realClang = Join-Path $clangDir "clang-cl-real.exe"
+              if (-not (Test-Path $realClang)) {
+                  Move-Item -Path $clangPath -Destination $realClang -Force
+              }
+              $csSource = Get-Content "src/brave/build/win/redirect_clang.cs" -Raw
+              Add-Type -TypeDefinition $csSource -OutputAssembly $clangPath -OutputType ConsoleApplication
+              Write-Host "redirect_cc successfully installed into $clangPath"
+          } else {
+              Write-Host "Warning: $clangPath not found!"
+          }
+
       - name: Compile Orien Browser (Release Mode)
         working-directory: src/brave
         shell: cmd
