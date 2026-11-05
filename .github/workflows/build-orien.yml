@@ -110,6 +110,19 @@ jobs:
           Write-Host "Verifying SDK directories:"
           Get-ChildItem -Path "$kitsRoot\include" | Select-Object Name
 
+          # Prepend NTDDI_WIN11_BR definition to Windows SDK headers
+          $patchDefinition = "#ifndef NTDDI_WIN11_BR`r`n#define NTDDI_WIN11_BR 0x0A000010`r`n#endif`r`n"
+          $keyHeaders = @("sdkddkver.h", "minwindef.h", "minwinbase.h", "windows.h", "winbase.h", "fileapi.h")
+          Get-ChildItem -Path "$kitsRoot\include" -Recurse -File | 
+              Where-Object { $_.Name -in $keyHeaders } | 
+              ForEach-Object {
+                  $content = Get-Content $_.FullName -Raw
+                  if ($content -notmatch "NTDDI_WIN11_BR") {
+                      Write-Host "Prepending NTDDI_WIN11_BR to $($_.FullName)"
+                      Set-Content -Path $_.FullName -Value ($patchDefinition + $content)
+                  }
+              }
+
       - name: Initialize & Sync Dependencies
         working-directory: src/brave
         shell: cmd
@@ -119,6 +132,19 @@ jobs:
           set NODE_OPTIONS=--experimental-strip-types
           call pnpm install
           node ./build/commands/scripts/sync.ts --init --no-history --lean_sync
+
+      - name: Patch Windows SDK Version in Chromium Build Config
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "src" -Recurse -Filter "BUILD.gn" | Where-Object { $_.FullName -match "config[\\/]win" } | ForEach-Object {
+              Write-Host "Checking $($_.FullName)"
+              $content = Get-Content $_.FullName -Raw
+              if ($content -match "NTDDI_WIN11_BR") {
+                  Write-Host "Patching NTDDI_WIN11_BR in $($_.FullName)..."
+                  $content = $content -replace '"NTDDI_VERSION=NTDDI_WIN11_BR"', '"NTDDI_VERSION=0x0A000010", "NTDDI_WIN11_BR=0x0A000010"'
+                  Set-Content -Path $_.FullName -Value $content
+              }
+          }
 
       - name: Compile Orien Browser (Release Mode)
         working-directory: src/brave
