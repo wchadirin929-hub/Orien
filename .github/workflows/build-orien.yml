@@ -172,8 +172,13 @@ jobs:
                   Move-Item -Path $clangPath -Destination $realClang -Force
               }
               $csc = "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
-              & $csc /target:exe /optimize+ /out:$clangPath "src/brave/build/win/redirect_clang.cs"
-              Write-Host "redirect_cc successfully installed into $clangPath"
+              $resolvedCs = (Resolve-Path "src/brave/build/win/redirect_clang.cs").Path
+              $resolvedClang = [System.IO.Path]::GetFullPath($clangPath)
+              & $csc /target:exe /optimize+ "/out:$resolvedClang" "$resolvedCs"
+              if ($LASTEXITCODE -ne 0) {
+                  throw "Failed to compile redirect_clang wrapper with exit code $LASTEXITCODE"
+              }
+              Write-Host "redirect_cc successfully installed into $resolvedClang"
           } else {
               Write-Host "Warning: $clangPath not found!"
           }
