@@ -16,6 +16,12 @@ jobs:
     runs-on: windows-2022
     timeout-minutes: 360
 
+    env:
+      AUTONINJA_BUILD_TOOL: ninja
+      SISO_ENABLE: '0'
+      use_siso: 'false'
+      DEPOT_TOOLS_WIN_TOOLCHAIN: '0'
+
     steps:
       - name: Configure Git Line Endings (Disable AutoCRLF)
         shell: pwsh
@@ -120,12 +126,15 @@ jobs:
         run: |
           set PATH=C:\depot_tools;%PATH%
           set DEPOT_TOOLS_WIN_TOOLCHAIN=0
+          set AUTONINJA_BUILD_TOOL=ninja
+          set SISO_ENABLE=0
+          set use_siso=false
           set NODE_OPTIONS=--experimental-strip-types
           set brave_services_key=dummy_orien_services_key
           set service_key_search=dummy_orien_search_key
           set service_key_stt=dummy_orien_stt_key
           set service_key_aichat=dummy_orien_aichat_key
-          call pnpm run build Release
+          call pnpm run build Release --gn use_siso:false --gn symbol_level:0
 
       - name: Package Portable Orien Browser
         shell: pwsh

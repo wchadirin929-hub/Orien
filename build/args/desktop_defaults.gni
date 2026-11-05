@@ -44,3 +44,9 @@ brave_services_key = "dummy_orien_services_key"
 service_key_search = "dummy_orien_search_key"
 service_key_stt = "dummy_orien_stt_key"
 service_key_aichat = "dummy_orien_aichat_key"
+
+# 7. Siso bypass and build optimizations
+use_siso = false
+symbol_level = 0
+blink_symbol_level = 0
+v8_symbol_level = 0
