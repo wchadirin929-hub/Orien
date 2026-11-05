@@ -136,8 +136,8 @@ jobs:
       - name: Patch Windows SDK Version in Chromium Build Config
         shell: pwsh
         run: |
-          $epoch = [int][double]::Parse((Get-Date -UFormat %s))
-          Write-Host "Current Unix Epoch for deterministic timestamp: $epoch"
+          $epoch = 1730000000
+          Write-Host "Deterministic Unix Epoch for timestamp: $epoch"
 
           # 1. Fix all LASTCHANGE.committime files across checkout
           Get-ChildItem -Path "src" -Recurse -Filter "*LASTCHANGE*" | ForEach-Object {
@@ -191,21 +191,63 @@ jobs:
               Write-Host "WARNING: $tarLock is missing!"
           }
 
+      - name: Restore Build Cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            src/out/Release/obj
+            src/out/Release/gen
+            src/out/Release/build.ninja
+            src/out/Release/.ninja_deps
+            src/out/Release/.ninja_log
+          key: orien-build-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            orien-build-${{ runner.os }}-
+
       - name: Compile Orien Browser (Release Mode)
         working-directory: src/brave
-        shell: cmd
+        shell: pwsh
         run: |
-          set PATH=C:\depot_tools;%PATH%
-          set DEPOT_TOOLS_WIN_TOOLCHAIN=0
-          set AUTONINJA_BUILD_TOOL=ninja
-          set SISO_ENABLE=0
-          set use_siso=false
-          set NODE_OPTIONS=--experimental-strip-types
-          set brave_services_key=dummy_orien_services_key
-          set service_key_search=dummy_orien_search_key
-          set service_key_stt=dummy_orien_stt_key
-          set service_key_aichat=dummy_orien_aichat_key
-          call pnpm run build Release --gn use_siso:false --gn symbol_level:0
+          $env:PATH = "C:\depot_tools;$env:PATH"
+          $env:DEPOT_TOOLS_WIN_TOOLCHAIN = "0"
+          $env:AUTONINJA_BUILD_TOOL = "ninja"
+          $env:SISO_ENABLE = "0"
+          $env:use_siso = "false"
+          $env:NODE_OPTIONS = "--experimental-strip-types"
+          $env:brave_services_key = "dummy_orien_services_key"
+          $env:service_key_search = "dummy_orien_search_key"
+          $env:service_key_stt = "dummy_orien_stt_key"
+          $env:service_key_aichat = "dummy_orien_aichat_key"
+
+          # 4.5 hour time budget (270 min) so runner has time to save cache before GitHub 360m limit
+          $maxMinutes = 270
+          $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+          Write-Host "Starting Orien build with time budget of $maxMinutes minutes..."
+
+          $pinfo = New-Object System.Diagnostics.ProcessStartInfo
+          $pinfo.FileName = "cmd.exe"
+          $pinfo.Arguments = "/c call pnpm run build Release --gn use_siso:false --gn symbol_level:0"
+          $pinfo.WorkingDirectory = (Get-Location).Path
+          $pinfo.UseShellExecute = $false
+
+          $proc = [System.Diagnostics.Process]::Start($pinfo)
+
+          while (-not $proc.HasExited) {
+              Start-Sleep -Seconds 30
+              if ($stopwatch.Elapsed.TotalMinutes -ge $maxMinutes) {
+                  Write-Host "Time budget reached ($maxMinutes min). Stopping Ninja gracefully to persist cache..."
+                  & taskkill /PID $proc.Id /T /F
+                  break
+              }
+          }
+
+          if ($proc.HasExited) {
+              $code = $proc.ExitCode
+              Write-Host "Compilation process exited with code $code"
+              if ($code -ne 0 -and $stopwatch.Elapsed.TotalMinutes -lt $maxMinutes) {
+                  throw "Compilation failed with exit code $code"
+              }
+          }
 
       - name: Package Portable Orien Browser
         shell: pwsh
@@ -213,7 +255,8 @@ jobs:
           $candidates = @("src/out/Release", "src/brave/out/Release", "out/Release")
           $outDir = $candidates | Where-Object { Test-Path "$_\brave.exe" -or Test-Path "$_\orien.exe" -or (Test-Path "$_\chrome.exe") } | Select-Object -First 1
           if (-not $outDir) {
-            $outDir = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+              Write-Host "Binaries not yet produced in this compilation cycle. Skipping zip packaging for this run."
+              exit 0
           }
           Write-Host "Packaging from outDir: $outDir"
 
@@ -250,8 +293,21 @@ jobs:
           Compress-Archive -Path "$distDir\*" -DestinationPath "Orien-Browser-Portable-Windows-x64.zip" -CompressionLevel Optimal
 
       - name: Upload Orien Portable Zip to Artifacts
+        if: hashFiles('Orien-Browser-Portable-Windows-x64.zip') != ''
         uses: actions/upload-artifact@v4
         with:
           name: Orien-Browser-Portable-Windows-x64
           path: Orien-Browser-Portable-Windows-x64.zip
           retention-days: 14
+
+      - name: Save Build Cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            src/out/Release/obj
+            src/out/Release/gen
+            src/out/Release/build.ninja
+            src/out/Release/.ninja_deps
+            src/out/Release/.ninja_log
+          key: orien-build-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}

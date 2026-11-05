@@ -50,3 +50,11 @@ use_siso = false
 symbol_level = 0
 blink_symbol_level = 0
 v8_symbol_level = 0
+
+# 8. Acceleration & Target Reduction for Lightweight Portable Orien
+enable_nacl = false
+enable_vr = false
+enable_remoting = false
+build_with_tflite_lib = false
+use_thin_lto = false
+thin_lto_enable_optimizations = false
