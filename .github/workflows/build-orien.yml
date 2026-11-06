@@ -191,6 +191,15 @@ jobs:
               Write-Host "WARNING: $tarLock is missing!"
           }
 
+          # 5. Normalize source files modification timestamps to fixed epoch (1730000000)
+          # Ensures restored cache .obj files are recognized as strictly newer than source code
+          $normalizer = "src/brave/tools/normalize_source_mtime.py"
+          if (Test-Path $normalizer) {
+              python $normalizer src
+          } elseif (Test-Path "tools/normalize_source_mtime.py") {
+              python "tools/normalize_source_mtime.py" src
+          }
+
       - name: Restore Build Cache
         uses: actions/cache/restore@v4
         with:
